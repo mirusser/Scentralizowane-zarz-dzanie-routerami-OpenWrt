@@ -1,0 +1,1 @@
+# Scentralizowane-zarz-dzanie-routerami-OpenWrt
