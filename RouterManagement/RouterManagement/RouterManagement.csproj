@@ -189,6 +189,8 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Logic\Connections\Interfaces\ISshConnection.cs" />
+    <Compile Include="Logic\Connections\SshConnection.cs" />
     <Compile Include="Logic\Controllers\AccountController.cs" />
     <Compile Include="Logic\Controllers\HomeController.cs" />
     <Compile Include="Logic\Controllers\ManageController.cs" />
@@ -215,6 +217,10 @@
     <Compile Include="Migrations\201703261537586_AddCommonSettingForAllRoutersAndConfigTableAndRoutersAccesDatasTable.cs" />
     <Compile Include="Migrations\201703261537586_AddCommonSettingForAllRoutersAndConfigTableAndRoutersAccesDatasTable.Designer.cs">
       <DependentUpon>201703261537586_AddCommonSettingForAllRoutersAndConfigTableAndRoutersAccesDatasTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703261740573_AddLoginAndPasswordToRouterModel.cs" />
+    <Compile Include="Migrations\201703261740573_AddLoginAndPasswordToRouterModel.Designer.cs">
+      <DependentUpon>201703261740573_AddLoginAndPasswordToRouterModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Context\ApplicationDbContext.cs" />
@@ -304,6 +310,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201703261537586_AddCommonSettingForAllRoutersAndConfigTableAndRoutersAccesDatasTable.resx">
       <DependentUpon>201703261537586_AddCommonSettingForAllRoutersAndConfigTableAndRoutersAccesDatasTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703261740573_AddLoginAndPasswordToRouterModel.resx">
+      <DependentUpon>201703261740573_AddLoginAndPasswordToRouterModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
