@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -23,24 +24,43 @@ namespace RouterManagement.Logic.Connections
 
         public SshConnection(IPAddress adresIp, int port, string username, string password)
         {
-            var host = string.Concat(adresIp.ToString(), port);
-            sshclient = new SshClient(host, username, password);
+            sshclient = new SshClient(adresIp.ToString(), port, username, password);
             connect();
         }
 
-        public SshConnection(string host, string username, string password)
+        public SshConnection(IPAddress adresIp, string username, string password)
         {
-            sshclient = new SshClient(host, username, password);
+            sshclient = new SshClient(adresIp.ToString(), username, password);
+            connect();
+        }
+
+        public SshConnection(string adresIp, string username, string password)
+        {
+            sshclient = new SshClient(adresIp, username, password);
+            connect();
+        }
+
+        public SshConnection(string adresIp, int port, string username, string password)
+        {
+            sshclient = new SshClient(adresIp, port, username, password);
             connect();
         }
 
         public SshConnection(RouterAccesData routerAccesData)
         {
-            var host = routerAccesData.Port == 0 ?
-                routerAccesData.RouterIp.ToString() :
-                string.Concat(routerAccesData.RouterIp.ToString(), routerAccesData.Port);
-
-            sshclient = new SshClient(host, routerAccesData.Login, routerAccesData.Password);
+            if (routerAccesData.Port == null || routerAccesData.Port == 0)
+            {
+                sshclient = new SshClient(routerAccesData.RouterIp.ToString(),
+                    routerAccesData.Login,
+                    routerAccesData.Password);
+            }
+            else
+            {
+                sshclient = new SshClient(routerAccesData.RouterIp.ToString(), 
+                    Convert.ToInt32(routerAccesData.Port),
+                    routerAccesData.Login,
+                    routerAccesData.Password);
+            }
             connect();
         }
 
@@ -69,7 +89,7 @@ namespace RouterManagement.Logic.Connections
         {
             sshclient.Connect();
 
-            stream = sshclient.CreateShellStream("customCommand", 80, 24, 800, 600, 1024);
+            stream = sshclient.CreateShellStream("cmd", 80, 24, 800, 600, 1024);
             reader = new StreamReader(stream);
             writer = new StreamWriter(stream)
             {
