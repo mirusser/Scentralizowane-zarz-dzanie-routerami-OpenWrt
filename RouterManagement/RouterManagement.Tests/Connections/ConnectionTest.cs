@@ -47,5 +47,25 @@ namespace RouterManagement.Tests.Connections
 
             Assert.IsFalse(string.IsNullOrEmpty(answer));
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void SendAndGetMessage_Failed()
+        {
+            var test1 = new SshConnection("192.168.2.1", "root", "konopie1");
+            var answer = test1.SendCommand("cecjnw");
+
+            Assert.IsFalse(string.IsNullOrEmpty(answer));
+        }
+
+        [TestMethod]
+        public void Send_UciShow_Succes()
+        {
+            var test1 = new SshConnection("192.168.2.1", "root", "konopie1");
+            var answer = test1.Send_UciShow();
+
+            Assert.IsTrue(answer != null);
+            Assert.IsTrue(answer.Count > 0);
+        }
     }
 }

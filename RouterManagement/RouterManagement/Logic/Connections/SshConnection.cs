@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -56,7 +58,7 @@ namespace RouterManagement.Logic.Connections
             }
             else
             {
-                sshclient = new SshClient(routerAccesData.RouterIp.ToString(), 
+                sshclient = new SshClient(routerAccesData.RouterIp.ToString(),
                     Convert.ToInt32(routerAccesData.Port),
                     routerAccesData.Login,
                     routerAccesData.Password);
@@ -71,6 +73,29 @@ namespace RouterManagement.Logic.Connections
             return sshclient.IsConnected;
         }
 
+        public Dictionary<string, string> Send_UciShow()
+        {
+            var answer = SendCommand("uci show");
+
+            //remove first line - command sent to router
+            answer = answer.Substring(answer.IndexOf(Environment.NewLine, StringComparison.Ordinal) + 1);
+            //remove two last lines (unrecognized log information)
+            answer = answer.Remove(answer.LastIndexOf(Environment.NewLine, StringComparison.Ordinal));
+            answer = answer.Remove(answer.LastIndexOf(Environment.NewLine, StringComparison.Ordinal));
+
+            using (var outputFile = new StreamWriter("File.txt"))
+            {
+                outputFile.Write(answer);
+            }
+
+            var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var currentConfigurationDictionary = entriesTable
+                .Select(part => part.Split('='))
+                .ToDictionary(split => split[0], split => split[1]);
+
+            return currentConfigurationDictionary;
+        }
+
         public string SendCommand(string customCmd)
         {
             var strAnswer = new StringBuilder();
@@ -79,8 +104,14 @@ namespace RouterManagement.Logic.Connections
 
             strAnswer.AppendLine(readStream());
 
-            var answer = strAnswer.ToString();
-            return answer.Trim();
+            var answer = strAnswer.ToString().Trim();
+
+            if (answer.Contains(string.Concat("-ash: ", customCmd, ": not found")))
+            {
+                throw new InvalidOperationException(string.Concat("Unrecognized command: ", customCmd));
+            }
+
+            return answer;
         }
 
         #region private methods
@@ -95,6 +126,8 @@ namespace RouterManagement.Logic.Connections
             {
                 AutoFlush = true
             };
+
+            SendCommand("reset");
         }
 
         private void writeStream(string cmd)
