@@ -1,0 +1,15 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
+
+namespace RouterManagement.Models
+{
+    public class RouterAccesData
+    {
+        [Key]
+        [Required]
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public IPAddress RouterIp { get; set; }
+        public int? Port { get; set; }
+    }
+}

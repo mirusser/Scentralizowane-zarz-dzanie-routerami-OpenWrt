@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 
-namespace RouterManagement.Models
+namespace RouterManagement.Models.ViewModels
 {
     public class IndexViewModel
     {

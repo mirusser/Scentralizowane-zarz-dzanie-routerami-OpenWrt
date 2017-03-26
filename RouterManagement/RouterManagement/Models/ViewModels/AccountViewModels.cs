@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace RouterManagement.Models
+namespace RouterManagement.Models.ViewModels
 {
     public class ExternalLoginConfirmationViewModel
     {
