@@ -135,16 +135,21 @@ namespace RouterManagement.Logic.Connections
 
         private void connect()
         {
-            sshclient.Connect();
-
-            stream = sshclient.CreateShellStream("cmd", 80, 24, 800, 600, 1024);
-            reader = new StreamReader(stream);
-            writer = new StreamWriter(stream)
+            try
             {
-                AutoFlush = true
-            };
+                sshclient.Connect();
+                stream = sshclient.CreateShellStream("cmd", 80, 24, 800, 600, 1024);
+                reader = new StreamReader(stream);
+                writer = new StreamWriter(stream)
+                {
+                    AutoFlush = true
+                };
 
-            SendCommand("reset");
+                SendCommand("reset");
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         private void writeStream(string cmd)

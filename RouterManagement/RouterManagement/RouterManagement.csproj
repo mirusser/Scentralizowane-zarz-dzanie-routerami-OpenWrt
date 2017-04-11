@@ -192,6 +192,7 @@
     <Compile Include="Logic\Connections\Interfaces\ISshConnection.cs" />
     <Compile Include="Logic\Connections\SshConnection.cs" />
     <Compile Include="Logic\Controllers\AccountController.cs" />
+    <Compile Include="Logic\Controllers\AdminController.cs" />
     <Compile Include="Logic\Controllers\HomeController.cs" />
     <Compile Include="Logic\Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
@@ -289,6 +290,10 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Home\Partials\_LoginOnHomePage.cshtml" />
+    <Content Include="Views\Home\Partials\_Home.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\SendUciShow.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

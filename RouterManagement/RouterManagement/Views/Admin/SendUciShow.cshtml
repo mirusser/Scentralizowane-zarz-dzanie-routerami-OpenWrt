@@ -1,0 +1,46 @@
+﻿@model Dictionary<string, string>
+
+@Styles.Render("~/bundles/jquery")
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="http://listjs.com/assets/javascripts/list.min.js"></script>
+
+@{
+    ViewBag.Title = "SendUciShow";
+}
+
+<h2>SendUciShow</h2>
+<hr>
+<div id="configurations">
+    <table>
+        <thead>
+            <tr>
+                <th class="sort" data-sort="key">Key</th>
+                <th class="sort" data-sort="value">Value</th>
+                <th colspan="2">
+                    <input type="text" class="search" placeholder="Search configuration" />
+                </th>
+            </tr>
+        </thead>
+        <tbody class="list">
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="key">@item.Key</td>
+                    <td class="value">@item.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    var options = {
+        valueNames: ['key', 'value']
+    };
+
+    // Init list
+    var contactList = new List('configurations', options);
+
+    var keyField = $('#key-field'),
+        valueField = $('#value-field');
+</script>
