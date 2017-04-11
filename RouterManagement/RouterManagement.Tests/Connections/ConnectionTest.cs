@@ -13,16 +13,16 @@ namespace RouterManagement.Tests.Connections
         [TestMethod]
         public void Connect_Succes()
         {
-            var test1 = new SshConnection("192.168.2.1", "root", "konopie1");
-            var test2 = new SshConnection("192.168.2.1", 22, "root", "konopie1");
+            var test1 = new SshConnection("192.168.1.1", "root", "konopie");
+            var test2 = new SshConnection("192.168.1.1", 22, "root", "konopie");
 
-            var ip = IPAddress.Parse("192.168.2.1");
-            var test3 = new SshConnection(ip, "root", "konopie1");
+            var ip = IPAddress.Parse("192.168.1.1");
+            var test3 = new SshConnection(ip, "root", "konopie");
 
             var router = new RouterAccesData
             {
                 Login = "root",
-                Password = "konopie1",
+                Password = "konopie",
                 RouterIp = ip,
                 Port = 22
             };
@@ -33,16 +33,16 @@ namespace RouterManagement.Tests.Connections
         [ExpectedException(typeof(SocketException))]
         public void Connect_Failed()
         {
-            var test1 = new SshConnection("192.168.5.1", "root", "konopie1");
-            var test2 = new SshConnection("192.168.5.1", "login", "konopie1");
-            var test3 = new SshConnection("192.168.2.1", 22, "root", "aaa");
-            var test4 = new SshConnection("192.168.2.1", 33, "root", "aaa");
+            var test1 = new SshConnection("192.168.5.1", "root", "konopie");
+            var test2 = new SshConnection("192.168.5.1", "login", "konopie");
+            var test3 = new SshConnection("192.168.1.1", 22, "root", "aaa");
+            var test4 = new SshConnection("192.168.1.1", 33, "root", "aaa");
         }
 
         [TestMethod]
         public void SendAndGetMessage_Succes()
         {
-            var test1 = new SshConnection("192.168.2.1", "root", "konopie1");
+            var test1 = new SshConnection("192.168.1.1", "root", "konopie");
             var answer = test1.SendCommand("uci show");
 
             Assert.IsFalse(string.IsNullOrEmpty(answer));
@@ -52,7 +52,7 @@ namespace RouterManagement.Tests.Connections
         [ExpectedException(typeof(InvalidOperationException))]
         public void SendAndGetMessage_Failed()
         {
-            var test1 = new SshConnection("192.168.2.1", "root", "konopie1");
+            var test1 = new SshConnection("192.168.1.1", "root", "konopie");
             var answer = test1.SendCommand("cecjnw");
 
             Assert.IsFalse(string.IsNullOrEmpty(answer));
@@ -61,8 +61,18 @@ namespace RouterManagement.Tests.Connections
         [TestMethod]
         public void Send_UciShow_Succes()
         {
-            var test1 = new SshConnection("192.168.2.1", "root", "konopie1");
+            var test1 = new SshConnection("192.168.1.1", "root", "konopie");
             var answer = test1.Send_UciShow();
+
+            Assert.IsTrue(answer != null);
+            Assert.IsTrue(answer.Count > 0);
+        }
+
+        [TestMethod]
+        public void Send_UciShowWireless_Succes()
+        {
+            var test1 = new SshConnection("192.168.1.1", "root", "konopie");
+            var answer = test1.Send_UciShowWireless();
 
             Assert.IsTrue(answer != null);
             Assert.IsTrue(answer.Count > 0);

@@ -77,23 +77,14 @@ namespace RouterManagement.Logic.Connections
         {
             var answer = SendCommand("uci show");
 
-            //remove first line - command sent to router
-            answer = answer.Substring(answer.IndexOf(Environment.NewLine, StringComparison.Ordinal) + 1);
-            //remove two last lines (unrecognized log information)
-            answer = answer.Remove(answer.LastIndexOf(Environment.NewLine, StringComparison.Ordinal));
-            answer = answer.Remove(answer.LastIndexOf(Environment.NewLine, StringComparison.Ordinal));
+            return parseAnswerToDictionary(answer);
+        }
 
-            using (var outputFile = new StreamWriter("File.txt"))
-            {
-                outputFile.Write(answer);
-            }
+        public Dictionary<string, string> Send_UciShowWireless()
+        {
+            var answer = SendCommand("uci show wireless");
 
-            var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-            var currentConfigurationDictionary = entriesTable
-                .Select(part => part.Split('='))
-                .ToDictionary(split => split[0], split => split[1]);
-
-            return currentConfigurationDictionary;
+            return parseAnswerToDictionary(answer);
         }
 
         public string SendCommand(string customCmd)
@@ -111,10 +102,36 @@ namespace RouterManagement.Logic.Connections
                 throw new InvalidOperationException(string.Concat("Unrecognized command: ", customCmd));
             }
 
+            if (answer.Contains("Entry not found"))
+            {
+                throw new InvalidOperationException(string.Concat("Entry not found for command: ", customCmd));
+            }
+
             return answer;
         }
 
         #region private methods
+
+        private static Dictionary<string, string> parseAnswerToDictionary(string answer)
+        {
+            //remove first line - command sent to router
+            answer = answer.Substring(answer.IndexOf(Environment.NewLine, StringComparison.Ordinal) + 1);
+            //remove two last lines (unrecognized log information)
+            answer = answer.Remove(answer.LastIndexOf(Environment.NewLine, StringComparison.Ordinal));
+            answer = answer.Remove(answer.LastIndexOf(Environment.NewLine, StringComparison.Ordinal));
+            //remove new line mark as first char
+            if (answer.FirstOrDefault().Equals('\n'))
+            {
+                answer = answer.Remove(0,1);
+            }
+
+            var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var entriesAsDictionary = entriesTable
+                .Select(part => part.Split('='))
+                .ToDictionary(split => split[0], split => split[1]);
+
+            return entriesAsDictionary;
+        }
 
         private void connect()
         {
