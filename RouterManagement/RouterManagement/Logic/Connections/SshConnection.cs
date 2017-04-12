@@ -8,6 +8,7 @@ using System.Threading;
 using Renci.SshNet;
 using RouterManagement.Logic.Connections.Interfaces;
 using RouterManagement.Models;
+using RouterManagement.Models.ViewModels;
 
 namespace RouterManagement.Logic.Connections
 {
@@ -85,6 +86,25 @@ namespace RouterManagement.Logic.Connections
             var answer = SendCommand("uci show wireless");
 
             return parseAnswerToDictionary(answer);
+        }
+
+        public void Send_UciSetWireless(SendUciShowWirelessViewModel wireless)
+        {
+            writeStream($"uci set wireless.@wifi-device[0].disabled={Convert.ToInt32(wireless.Disabled)}");
+            writeStream($"uci set wireless.@wifi-device[0].channel={wireless.Channel}");
+            writeStream($"uci set wireless.@wifi-iface[0].ssid={wireless.Ssid}");
+            writeStream($"uci set wireless.@wifi-iface[0].encryption={wireless.Encryption}");
+            writeStream($"uci set wireless.@wifi-iface[0].key={wireless.Key}");
+            writeStream($"uci set wireless.@wifi-iface[0].mode={wireless.Mode}");
+            writeStream($"uci set wireless.@wifi-iface[0].network={wireless.Network}");
+            if (wireless.Network == "wan")
+            {
+                //writeStream($"uci del network.wan");
+                writeStream($"uci set network.wan=interface");
+                writeStream($"uci set network.wan.proto=dhcp");
+            }
+
+            writeStream($"uci commit");
         }
 
         public string SendCommand(string customCmd)

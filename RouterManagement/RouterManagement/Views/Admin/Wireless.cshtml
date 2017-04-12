@@ -1,0 +1,95 @@
+﻿@model RouterManagement.Models.ViewModels.SendUciShowWirelessViewModel
+
+@Styles.Render("~/bundles/jquery")
+<script src="http://listjs.com/assets/javascripts/list.min.js"></script>
+
+@{
+    ViewBag.Title = "SendUciShow";
+}
+
+<h2>Current wireless configuration</h2>
+<hr>
+<div id="configurations">
+    <table>
+        <thead>
+        <tr>
+            <th class="sort" data-sort="key">Key</th>
+            <th class="sort" data-sort="value">Value</th>
+            <th colspan="2">
+                <input type="text" class="search" placeholder="Search configuration" />
+            </th>
+        </tr>
+        </thead>
+        <tbody class="list">
+        <tr>
+            <td class="key">Disabled</td>
+            <td class="value">@Model.Disabled</td>
+        </tr>
+        <tr>
+            <td class="key">Channel</td>
+            <td class="value">@Model.Channel</td>
+        </tr>
+        <tr>
+            <td class="key">SSID</td>
+            <td class="value">@Model.Ssid</td>
+        </tr>
+        <tr>
+            <td class="key">Encryption</td>
+            <td class="value">@Model.Encryption</td>
+        </tr>
+        <tr>
+            <td class="key">Key</td>
+            <td class="value">@Model.Key</td>
+        </tr>
+        <tr>
+            <td class="key">Mode</td>
+            <td class="value">@Model.Mode</td>
+        </tr>
+        <tr>
+            <td class="key">Network</td>
+            <td class="value">@Model.Network</td>
+        </tr>
+
+        </tbody>
+    </table>
+    <button id="editWirelessBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Edit wireless</button>
+</div>
+
+<div id="editWirelessModal" class="modal fade in" data-url='@Url.Action("EditWirelessPartial")'>
+    <div id="editWirelessContainer"></div>
+</div>
+
+<script>
+    var options = {
+        valueNames: ['key', 'value']
+    };
+
+    var configurationsList = new List('configurations', options);
+
+    $(document).ready(function() {
+        $(document).on('click', '#editWirelessBtn', function () {
+            const objectToSend = {
+                Disabled: configurationsList.get("key", "Disabled")[0]._values.value,
+                Channel: configurationsList.get("key", "Channel")[0]._values.value,
+                SSID: configurationsList.get("key", "SSID")[0]._values.value,
+                Encryption: configurationsList.get("key", "Encryption")[0]._values.value,
+                Key: configurationsList.get("key", "Key")[0]._values.value,
+                Mode: configurationsList.get("key", "Mode")[0]._values.value,
+                Network: configurationsList.get("key", "Network")[0]._values.value
+            };
+
+            const url = $('#editWirelessModal').data('url');
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: objectToSend,
+                cache: false,
+                success: function (data) {
+                    $('#editWirelessContainer').html(data);
+                    $('#editWirelessModal').appendTo("body").modal('show');
+                }
+            });
+        });
+    });
+</script>
