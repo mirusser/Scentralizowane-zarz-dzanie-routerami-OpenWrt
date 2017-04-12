@@ -1,24 +1,29 @@
 ﻿@model List<RouterManagement.Models.ViewModels.FirewallViewModel>
-    
+
 @*TODO ALL FILE*@
 
 @Styles.Render("~/bundles/jquery")
 <script src="http://listjs.com/assets/javascripts/list.min.js"></script>
 
 @{
-    ViewBag.Title = "Wireless";
+    ViewBag.Title = "Firewall";
 }
 
-<h2>Current wireless configuration</h2>
+<h2>Current firewall rules</h2>
 <hr>
-<div id="configurations">
-    <table>
-        <thead>
+<div id="rules">
+    <table class="table table-striped table-bordered">
+        <thead class="thead-inverse">
             <tr>
-                <th class="sort" data-sort="key">Key</th>
-                <th class="sort" data-sort="value">Value</th>
+                <th class="sort" data-sort="Id">Id</th>
+                <th class="sort" data-sort="Type">Type</th>
+                <th class="sort" data-sort="Is_Ingreee">Is ingreee?</th>
+                <th class="sort" data-sort="Description">Description</th>
+                <th class="sort" data-sort="Local_addr">Addresses</th>
+                <th class="sort" data-sort="Active_hours">Active hours</th>
+                <th class="sort" data-sort="Enabled">Enabled?</th>
                 <th colspan="2">
-                    <input type="text" class="search" placeholder="Search configuration" />
+                    <input type="text" class="search" placeholder="Search entity" />
                 </th>
             </tr>
         </thead>
@@ -26,21 +31,39 @@
             @foreach (var f in Model)
             {
                 <tr>
-                    <td class="Type">f.Type</td>
-                    <td class="Is_Ingreee">@f.Is_Ingreee</td>
-                    <td class="Description">@f.Description</td>
-                    <td class="Local_addr">@String.Join(", ", f.Local_addr)</td>
-                    <td class="Active_hours">@String.Join(", ", f.Active_hours)</td>
-                    <td class="Enabled">@f.Enabled</td>
+                    <td class="id">@f.Id</td>
+                    <td class="type">@f.Type</td>
+                    <td class="is_Ingreee">@f.Is_Ingreee</td>
+                    <td class="description">@f.Description</td>
+                    @if (f.Local_addr != null)
+                    {
+                        <td class="local_addr">@String.Join(Environment.NewLine, f.Local_addr)</td>
+                    }
+                    else
+                    {
+                        <td class="local_addr">@String.Empty</td>
+                    }
+
+                    @if (f.Active_hours != null)
+                    {
+                        <td class="active_hours">@String.Join(Environment.NewLine, f.Active_hours)</td>
+                    }
+                    else
+                    {
+                        <td class="active_hours">@String.Empty</td>
+                    }
+                    <td class="enabled">@f.Enabled</td>
+                    <td class="edit"><button class="edit-item btn btn-primary">Edit</button></td>
+                    <td class="remove"><button class="remove-item btn btn-danger">Delete</button></td>
                 </tr>
             }
         </tbody>
     </table>
-    <button id="editWirelessBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Edit wireless</button>
+    <button id="addRuleBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Add rule</button>
 </div>
 
-<div id="editWirelessModal" class="modal fade in" data-url='@Url.Action("EditWirelessPartial")'>
-    <div id="editWirelessContainer"></div>
+<div id="addRuleModal" class="modal fade in" data-url='@Url.Action("addRulePartial")'>
+    <div id="addRuleContainer"></div>
 </div>
 
 <script>
@@ -48,30 +71,76 @@
         valueNames: ['key', 'value']
     };
 
-    var configurationsList = new List('configurations', options);
+    var rulesList = new List('rules', options);
 
     $(document).ready(function () {
-        $(document).on('click', '#editWirelessBtn', function () {
-            const objectToSend = {
-                Disabled: configurationsList.get("key", "Disabled")[0]._values.value,
-                Channel: configurationsList.get("key", "Channel")[0]._values.value,
-                SSID: configurationsList.get("key", "SSID")[0]._values.value,
-                Encryption: configurationsList.get("key", "Encryption")[0]._values.value,
-                Key: configurationsList.get("key", "Key")[0]._values.value,
-                Mode: configurationsList.get("key", "Mode")[0]._values.value,
-                Network: configurationsList.get("key", "Network")[0]._values.value
-            };
+        //$(document).on('click', '#addRuleBtn', function () {
+        //    const objectToSend = {
+        //        Disabled: configurationsList.get("key", "Disabled")[0]._values.value,
+        //        Channel: configurationsList.get("key", "Channel")[0]._values.value,
+        //        SSID: configurationsList.get("key", "SSID")[0]._values.value,
+        //        Encryption: configurationsList.get("key", "Encryption")[0]._values.value,
+        //        Key: configurationsList.get("key", "Key")[0]._values.value,
+        //        Mode: configurationsList.get("key", "Mode")[0]._values.value,
+        //        Network: configurationsList.get("key", "Network")[0]._values.value
+        //    };
 
-            const url = $('#editWirelessModal').data('url');
+        //    const url = $('#addRuleModal').data('url');
 
+        //    $.ajax({
+        //        type: "POST",
+        //        url: url,
+        //        data: objectToSend,
+        //        cache: false,
+        //        success: function (data) {
+        //            $('#addRuleContainer').html(data);
+        //            $('#addRuleModal').appendTo("body").modal('show');
+        //        }
+        //    });
+        //});
+
+        //$(document).on('click', '.edit-item', function () {
+        //    const publicationId = $(this).closest('tr').find('.id').text();
+        //    const item = publicationList.get('id', publicationId)[0];
+
+        //    const objectToSend = {
+        //        Id: item._values.id,
+        //        TeacherAuthorsId: item._values.teacherAuthorsId,
+        //        AnotherAuthors: item._values.anotherAuthors,
+        //        Title: item._values.anotherAuthors,
+        //        PublishedIn: item._values.publishedIn,
+        //        AdditionalInfo: item._values.additionalInfo
+        //    };
+
+        //    const url = $('#modifyPublicationModal').data('url');
+
+        //    $.ajax({
+        //        type: "POST",
+        //        url: url,
+        //        data: objectToSend,
+        //        cache: false,
+        //        success: function (data) {
+        //            $('#modifyPublicationContainer').html(data);
+
+        //            $('#modifyPublicationModal').appendTo("body").modal('show');
+        //        }
+        //    });
+        //});
+
+        $(document).on('click', '.remove-item', function () {
+            var ruleId = $(this).closest('tr').find('.id').text();
             $.ajax({
                 type: "POST",
-                url: url,
-                data: objectToSend,
+                url: "/Admin/RemoveRule",
+                data: { 'ruleId': ruleId },
                 cache: false,
-                success: function (data) {
-                    $('#editWirelessContainer').html(data);
-                    $('#editWirelessModal').appendTo("body").modal('show');
+                success: function (result) {
+                    if (result)                    {
+                        rulesList.remove("id", publicationId);
+                    }
+                    else {
+                        alert("There was a problem when deleting rule.")
+                    }
                 }
             });
         });

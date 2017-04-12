@@ -81,11 +81,41 @@ namespace RouterManagement.Logic.Connections
             return parseAnswerToDictionary(answer);
         }
 
+        public Dictionary<string, string> SendFake_UciShow()
+        {
+            using (WebClient client = new WebClient())
+            {
+                string answer = client.DownloadString("http://wklej.org/id/3085238/txt/");
+
+                var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var entriesAsDictionary = entriesTable
+                    .Select(part => part.Split('='))
+                    .ToDictionary(split => split[0], split => split[1]);
+
+                return entriesAsDictionary;
+            }
+        }
+
         public Dictionary<string, string> Send_UciShowWireless()
         {
             var answer = SendCommand("uci show wireless");
 
             return parseAnswerToDictionary(answer);
+        }
+
+        public Dictionary<string, string> SendFake_UciShowWireless()
+        {
+            using (WebClient client = new WebClient())
+            {
+                string answer = client.DownloadString("http://wklej.org/id/3085279/txt/");
+
+                var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var entriesAsDictionary = entriesTable
+                    .Select(part => part.Split('='))
+                    .ToDictionary(split => split[0], split => split[1]);
+
+                return entriesAsDictionary;
+            }
         }
 
         public void Send_UciSetWireless(SendUciShowWirelessViewModel wireless)
@@ -111,6 +141,27 @@ namespace RouterManagement.Logic.Connections
         {
             var answer = SendCommand("uci show firewall");
             return parseAnswerToDictionary(answer);
+        }
+
+        public Dictionary<string, string> SendFake_UciShowFirewall()
+        {
+            using (WebClient client = new WebClient())
+            {
+                string answer = client.DownloadString("http://wklej.org/id/3085278/txt/");
+
+                var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var entriesAsDictionary = entriesTable
+                    .Select(part => part.Split('='))
+                    .ToDictionary(split => split[0], split => split[1]);
+
+                return entriesAsDictionary;
+            }
+        }
+
+        public void Send_DeleteFirewallRule(int ruleId)
+        {
+            SendCommand($"uci delete firewall.rule_{ruleId}");
+            SendCommand($"uci commit firewall");
         }
 
         public string SendCommand(string customCmd)

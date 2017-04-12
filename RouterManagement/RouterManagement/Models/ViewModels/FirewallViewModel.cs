@@ -7,6 +7,7 @@ namespace RouterManagement.Models.ViewModels
 {
     public class FirewallViewModel
     {
+        public int Id { get; set; }
         public string Type { get; set; }
         public bool Is_Ingreee { get; set; }
         public string Description { get; set; }

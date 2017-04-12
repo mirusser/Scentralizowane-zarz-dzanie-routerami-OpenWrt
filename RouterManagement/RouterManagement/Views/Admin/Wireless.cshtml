@@ -10,45 +10,45 @@
 <h2>Current wireless configuration</h2>
 <hr>
 <div id="configurations">
-    <table>
-        <thead>
-        <tr>
-            <th class="sort" data-sort="key">Key</th>
-            <th class="sort" data-sort="value">Value</th>
-            <th colspan="2">
-                <input type="text" class="search" placeholder="Search configuration" />
-            </th>
-        </tr>
+    <table class="table table-striped table-bordered">
+        <thead class="thead-inverse">
+            <tr>
+                <th class="sort" data-sort="key">Key</th>
+                <th class="sort" data-sort="value">Value</th>
+                <th colspan="2">
+                    <input type="text" class="search" placeholder="Search configuration" />
+                </th>
+            </tr>
         </thead>
         <tbody class="list">
-        <tr>
-            <td class="key">Disabled</td>
-            <td class="value">@Model.Disabled</td>
-        </tr>
-        <tr>
-            <td class="key">Channel</td>
-            <td class="value">@Model.Channel</td>
-        </tr>
-        <tr>
-            <td class="key">SSID</td>
-            <td class="value">@Model.Ssid</td>
-        </tr>
-        <tr>
-            <td class="key">Encryption</td>
-            <td class="value">@Model.Encryption</td>
-        </tr>
-        <tr>
-            <td class="key">Key</td>
-            <td class="value">@Model.Key</td>
-        </tr>
-        <tr>
-            <td class="key">Mode</td>
-            <td class="value">@Model.Mode</td>
-        </tr>
-        <tr>
-            <td class="key">Network</td>
-            <td class="value">@Model.Network</td>
-        </tr>
+            <tr>
+                <td class="key">Disabled</td>
+                <td class="value">@Model.Disabled</td>
+            </tr>
+            <tr>
+                <td class="key">Channel</td>
+                <td class="value">@Model.Channel</td>
+            </tr>
+            <tr>
+                <td class="key">SSID</td>
+                <td class="value">@Model.Ssid</td>
+            </tr>
+            <tr>
+                <td class="key">Encryption</td>
+                <td class="value">@Model.Encryption</td>
+            </tr>
+            <tr>
+                <td class="key">Key</td>
+                <td class="value">@Model.Key</td>
+            </tr>
+            <tr>
+                <td class="key">Mode</td>
+                <td class="value">@Model.Mode</td>
+            </tr>
+            <tr>
+                <td class="key">Network</td>
+                <td class="value">@Model.Network</td>
+            </tr>
 
         </tbody>
     </table>
