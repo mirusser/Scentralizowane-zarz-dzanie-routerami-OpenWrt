@@ -107,6 +107,12 @@ namespace RouterManagement.Logic.Connections
             writeStream($"uci commit");
         }
 
+        public Dictionary<string, string> Send_UciShowFirewall()
+        {
+            var answer = SendCommand("uci show firewall");
+            return parseAnswerToDictionary(answer);
+        }
+
         public string SendCommand(string customCmd)
         {
             var strAnswer = new StringBuilder();

@@ -1,4 +1,6 @@
-﻿@model RouterManagement.Models.ViewModels.SendUciShowWirelessViewModel
+﻿@model List<RouterManagement.Models.ViewModels.FirewallViewModel>
+    
+@*TODO ALL FILE*@
 
 @Styles.Render("~/bundles/jquery")
 <script src="http://listjs.com/assets/javascripts/list.min.js"></script>
@@ -12,44 +14,26 @@
 <div id="configurations">
     <table>
         <thead>
-        <tr>
-            <th class="sort" data-sort="key">Key</th>
-            <th class="sort" data-sort="value">Value</th>
-            <th colspan="2">
-                <input type="text" class="search" placeholder="Search configuration" />
-            </th>
-        </tr>
+            <tr>
+                <th class="sort" data-sort="key">Key</th>
+                <th class="sort" data-sort="value">Value</th>
+                <th colspan="2">
+                    <input type="text" class="search" placeholder="Search configuration" />
+                </th>
+            </tr>
         </thead>
         <tbody class="list">
-        <tr>
-            <td class="key">Disabled</td>
-            <td class="value">@Model.Disabled</td>
-        </tr>
-        <tr>
-            <td class="key">Channel</td>
-            <td class="value">@Model.Channel</td>
-        </tr>
-        <tr>
-            <td class="key">SSID</td>
-            <td class="value">@Model.Ssid</td>
-        </tr>
-        <tr>
-            <td class="key">Encryption</td>
-            <td class="value">@Model.Encryption</td>
-        </tr>
-        <tr>
-            <td class="key">Key</td>
-            <td class="value">@Model.Key</td>
-        </tr>
-        <tr>
-            <td class="key">Mode</td>
-            <td class="value">@Model.Mode</td>
-        </tr>
-        <tr>
-            <td class="key">Network</td>
-            <td class="value">@Model.Network</td>
-        </tr>
-
+            @foreach (var f in Model)
+            {
+                <tr>
+                    <td class="Type">f.Type</td>
+                    <td class="Is_Ingreee">@f.Is_Ingreee</td>
+                    <td class="Description">@f.Description</td>
+                    <td class="Local_addr">@String.Join(", ", f.Local_addr)</td>
+                    <td class="Active_hours">@String.Join(", ", f.Active_hours)</td>
+                    <td class="Enabled">@f.Enabled</td>
+                </tr>
+            }
         </tbody>
     </table>
     <button id="editWirelessBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Edit wireless</button>
@@ -66,7 +50,7 @@
 
     var configurationsList = new List('configurations', options);
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         $(document).on('click', '#editWirelessBtn', function () {
             const objectToSend = {
                 Disabled: configurationsList.get("key", "Disabled")[0]._values.value,

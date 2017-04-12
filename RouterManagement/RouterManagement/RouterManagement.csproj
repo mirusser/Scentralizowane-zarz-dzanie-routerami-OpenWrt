@@ -230,6 +230,7 @@
     <Compile Include="Models\CommonSetting.cs" />
     <Compile Include="Models\ConfigSetting.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\ViewModels\FirewallViewModel.cs" />
     <Compile Include="Models\ViewModels\ManageViewModels.cs" />
     <Compile Include="Models\RouterAccesData.cs" />
     <Compile Include="Models\ViewModels\SendUciShowWirelessViewModel.cs" />
@@ -297,6 +298,7 @@
     <Content Include="Views\Admin\SendUciShow.cshtml" />
     <Content Include="Views\Admin\Wireless.cshtml" />
     <Content Include="Views\Admin\PartialViews\_EditWirelessConfiguration.cshtml" />
+    <Content Include="Views\Admin\Firewall.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

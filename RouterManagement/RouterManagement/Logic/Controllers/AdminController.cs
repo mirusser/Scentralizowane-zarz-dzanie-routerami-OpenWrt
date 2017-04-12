@@ -28,6 +28,8 @@ namespace RouterManagement.Logic.Controllers
             return View(currentConfiguratrion);
         }
 
+        #region wireless
+
         public ActionResult Wireless(int? selectedRouter = null)
         {
             var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
@@ -67,5 +69,38 @@ namespace RouterManagement.Logic.Controllers
                 return Json(false, JsonRequestBehavior.AllowGet);
             }
         }
+
+        #endregion
+
+        #region firewall
+
+        public ActionResult Firewall(int? selectedRouter = null)
+        {
+            var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
+            var currentConfiguratrion = sshConnection?.Send_UciShowFirewall();
+
+            currentConfiguratrion = currentConfiguratrion.Where(c => c.Key.Contains("rule_")).ToDictionary(it => it.Key, it => it.Value);
+            var firewallList = new List<FirewallViewModel>();
+
+            var n = 1;
+            while (currentConfiguratrion.Any(c => c.Key.Contains($"firewall.rule_{n}")))
+            {
+                firewallList.Add(new FirewallViewModel
+                {
+                    Type = currentConfiguratrion[$"firewall.rule_{n}"],
+                    Is_Ingreee = (currentConfiguratrion[$"firewall.rule_{n}.is_ingress"] == "1"),
+                    Description = currentConfiguratrion[$"firewall.rule_{n}.description"],
+                    Local_addr = currentConfiguratrion[$"firewall.rule_{n}.local_addr"].Trim().Split(','),
+                    Active_hours = currentConfiguratrion[$"firewall.rule_{n}.active_hours"].Trim().Split(','),
+                    Enabled = (currentConfiguratrion[$"firewall.rule_{n}.enabled"] == "1"),
+                });
+
+                n++;
+            }
+
+            return View(firewallList);
+        }
+
+        #endregion
     }
 }
