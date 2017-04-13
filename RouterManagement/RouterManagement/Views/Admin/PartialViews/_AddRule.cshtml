@@ -66,34 +66,15 @@
                 return;
             }
 
+            if (!validateMACorIpAddressesSeparatedComa(objectToSend.Local_addr)) {
+                alert("You have typed adresses in not proper format");
+                return;
+            }
 
-            //TODO validation Local_addr and Active_hours (if typed)
-
-            //try {
-            //    var adresses = objectToSend.Local_addr.split(",");
-            //    for (var i = 0; i < adresses.length; i++) {
-            //        if (!(validateIPaddress(adresses[i]) && validateMACaddress(adresses[i]))) {
-            //            alert("Invalid adresses format");
-            //            return;
-            //        }
-            //    }
-            //} catch (e) {
-            //    alert(e);
-            //    return;
-            //}
-
-            //try {
-            //    var hours = objectToSend.Active_hours.split(",");
-            //    for (var i = 0, len = hours.length; i < len; i++) {
-            //        if ((!validateIPaddress(hours[i]) || validateMACaddress(hours[i]))) {
-            //            alert("Invalid hours format");
-            //            return;
-            //        }
-            //    }
-            //} catch (e) {
-            //    alert("Invalid hours format");
-            //    return;
-            //}
+            if (!validateHourSpansSeparatedComaOrEmpty(objectToSend.Active_hours)) {
+                alert("You have typed hours in not proper format");
+                return;
+            }
 
             $.ajax({
                 type: "POST",
@@ -101,15 +82,20 @@
                 data: objectToSend,
                 cache: false,
                 success: function (result) {
-                    rulesList.add({
-                        id: result.Id,
-                        type: "restriction_rule",
-                        is_Ingreee: $('is_Ingreee-addField').val(),
-                        description: $('#description-addField').val(),
-                        local_addr: $('#local_addr-addField').val().split(","),
-                        active_hours: $('#active_hours-addField').val().split(","),
-                        enabled: $('active-addField').val()
-                    });
+                    if (result.status) {
+                        rulesList.add({
+                            id: result.id,
+                            type: "restriction_rule",
+                            is_Ingreee: $('is_Ingreee-addField').val(),
+                            description: $('#description-addField').val(),
+                            local_addr: $('#local_addr-addField').val().split(","),
+                            active_hours: $('#active_hours-addField').val().split(","),
+                            enabled: $('#active-addField').val()
+                        });
+                    }
+                    else {
+                        alert("Error when adding new rule occured")
+                    }
 
                     $("#addRuleContainer").html("");
 
@@ -118,20 +104,9 @@
             });
         });
 
-        function validateIPaddress(inputText)  
-        {  
-            var format = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;  
-            if (format.test(inputText)){  
-                return true;
-            }
-            else  {  
-                return false;  
-            }  
-        }
-
-        function validateMACaddress(inputText) {
-            var format = /^([0-9A-F]{2}[:]){5}([0-9A-F]{2})$/;
-            if (format.test(inputText)) {
+        function validateMACorIpAddressesSeparatedComa(inputText) {
+            var format = /^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$/;
+            if (inputText.match(format) != null) {
                 return true;
             }
             else {
@@ -139,9 +114,9 @@
             }
         }
 
-        function validateHour(inputText) {
-            var format = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/;
-            if (format.test(inputText)) {
+        function validateHourSpansSeparatedComaOrEmpty(inputText) {
+            var format = /^((([0-1]?[0-9]|2[0-4]):([0-5][0-9])(-)([0-1]?[0-9]|2[0-4]):([0-5][0-9])(,))*([0-1]?[0-9]|2[0-4]):([0-5][0-9])(-)([0-1]?[0-9]|2[0-4]):([0-5][0-9]))*$/;
+            if (inputText.match(format) != null) {
                 return true;
             }
             else {

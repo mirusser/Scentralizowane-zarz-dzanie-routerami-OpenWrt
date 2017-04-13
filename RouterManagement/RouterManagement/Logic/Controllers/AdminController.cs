@@ -4,9 +4,11 @@ using System.Linq;
 using System.Web.Mvc;
 using RouterManagement.Logic.Connections;
 using RouterManagement.Models.ViewModels;
+using System.Text.RegularExpressions;
 
 namespace RouterManagement.Logic.Controllers
 {
+    [Authorize]
     public class AdminController : Controller
     {
         public ActionResult Index()
@@ -145,15 +147,24 @@ namespace RouterManagement.Logic.Controllers
         [HttpPost]
         public ActionResult SaveRule(AddFirewallRule rule)
         {
+            //test regex here: http://regexr.com/
+            if (string.IsNullOrEmpty(rule.Description) ||
+                string.IsNullOrEmpty(rule.Type) ||
+                !Regex.IsMatch(rule.Local_addr, @"^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$") ||
+                !Regex.IsMatch(rule.Active_hours, @"^((([0-1]?[0-9]|2[0-4]):([0-5][0-9])(-)([0-1]?[0-9]|2[0-4]):([0-5][0-9])(,))*([0-1]?[0-9]|2[0-4]):([0-5][0-9])(-)([0-1]?[0-9]|2[0-4]):([0-5][0-9]))*$"))
+            {
+                return Json(false, JsonRequestBehavior.AllowGet);
+            }
+
             try
             {
-                //var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
-                //TODO add rule to router
-                return Json(true, JsonRequestBehavior.AllowGet);
+                var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
+                var newId = sshConnection.Send_SaveFirewallRule(rule);
+                return Json(new { id = newId, status = true }, JsonRequestBehavior.AllowGet);
             }
             catch
             {
-                return Json(false, JsonRequestBehavior.AllowGet);
+                return Json(new { status = false }, JsonRequestBehavior.AllowGet);
             }
         }
 

@@ -163,6 +163,27 @@ namespace RouterManagement.Logic.Connections
         {
             SendCommand($"uci delete firewall.rule_{ruleId}");
             SendCommand($"uci commit firewall");
+
+            //TODO change all next rules numbers to -1
+        }
+
+        public int Send_SaveFirewallRule(AddFirewallRule rule)
+        {
+            var id = getNewId();
+
+            SendCommand($"firewall.rule_{id}={rule.Type}");
+            SendCommand($"firewall.rule_{id}.is_ingress={Convert.ToInt32(rule.Is_Ingreee)}");
+            SendCommand($"firewall.rule_{id}.description={rule.Description}");
+            SendCommand($"firewall.rule_{id}.local_addr={rule.Local_addr}");
+            if (!string.IsNullOrEmpty(rule.Active_hours))
+            {
+                SendCommand($"firewall.rule_{id}.active_hours={rule.Active_hours}");
+            }
+            SendCommand($"firewall.rule_{id}.enabled={Convert.ToInt32(rule.Enabled)}");
+
+            SendCommand($"uci commit firewall");
+
+            return id;
         }
 
         public string SendCommand(string customCmd)
@@ -225,9 +246,7 @@ namespace RouterManagement.Logic.Connections
 
                 SendCommand("reset");
             }
-            catch (Exception ex)
-            {
-            }
+            catch { }
         }
 
         private void writeStream(string cmd)
@@ -250,6 +269,23 @@ namespace RouterManagement.Logic.Connections
             }
 
             return result.ToString();
+        }
+
+        private int getNewId()
+        {
+            var answer = Send_UciShowFirewall();
+            var rules = answer.Select(it => it.Key).Where(k => k.Contains("firewall.rule_"));
+            List<int> ids = new List<int>();
+            foreach (var r in rules)
+            {
+                try
+                {
+                    ids.Add((int)char.GetNumericValue(r[14]));
+                }
+                catch { }
+            }
+
+            return ids.Max() + 1;
         }
 
         #endregion
