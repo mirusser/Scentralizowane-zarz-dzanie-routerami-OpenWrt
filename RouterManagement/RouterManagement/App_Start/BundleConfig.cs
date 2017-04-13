@@ -28,7 +28,8 @@ namespace RouterManagement
             #endregion
 
             #region Additional plugins and styles
-
+            bundles.Add(new ScriptBundle("~/bundles/ListJS").Include(
+                        "~/Scripts/list.js"));
             #endregion
 
             #region Pages Styles
