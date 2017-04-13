@@ -1,0 +1,152 @@
+﻿<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add rule</h4>
+    </div>
+    <div class="modal-body">
+        <table class="table table-bordered">
+            <tr>
+                <td class="is_Ingreee">
+                    <p>Is ingree?</p>
+                    <select class="form-control" id="is_Ingreee-addField">
+                        <option value="true">True</option>
+                        <option value="false" selected>False</option>
+                    </select>
+                </td>
+                <td class="description">
+                    <p>Description</p>
+                    <input type="text" class="form-control" id="description-addField" placeholder="Sister tablet" />
+                </td>
+                <td class="active">
+                    <p>Is active?</p>
+                    <select class="form-control" id="active-addField">
+                        <option value="true" selected>True</option>
+                        <option value="false">False</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="local_addr">
+                    <p>MACs and/or IPs</p>
+                    <input type="text" class="form-control" id="local_addr-addField" placeholder="6C:5F:1C:9E:F5:53,192.168.2.107" />
+                </td>
+                <td class="active_hours">
+                    <p>Hours (empty = permanent)</p>
+                    <input type="text" class="form-control" id="active_hours-addField" placeholder="23:30-23:59,00:00-08:00" />
+                </td>
+                <td class="add">
+                    <button id="addRule-btn" class="btn btn-success">Add</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#addRule-btn").click(function () {
+            var objectToSend = {
+                Type: "restriction_rule",
+                Is_Ingreee: $('is_Ingreee-addField').val(),
+                Description: $('#description-addField').val(),
+                Local_addr: $('#local_addr-addField').val(),
+                Active_hours: $('#active_hours-addField').val(),
+                Enabled: $('active-addField').val()
+            }
+
+            if (objectToSend.Description.length === 0) {
+                alert("You have to type description");
+                return;
+            }
+
+            if (objectToSend.Local_addr.length === 0) {
+                alert("You have to type addresses");
+                return;
+            }
+
+
+            //TODO validation Local_addr and Active_hours (if typed)
+
+            //try {
+            //    var adresses = objectToSend.Local_addr.split(",");
+            //    for (var i = 0; i < adresses.length; i++) {
+            //        if (!(validateIPaddress(adresses[i]) && validateMACaddress(adresses[i]))) {
+            //            alert("Invalid adresses format");
+            //            return;
+            //        }
+            //    }
+            //} catch (e) {
+            //    alert(e);
+            //    return;
+            //}
+
+            //try {
+            //    var hours = objectToSend.Active_hours.split(",");
+            //    for (var i = 0, len = hours.length; i < len; i++) {
+            //        if ((!validateIPaddress(hours[i]) || validateMACaddress(hours[i]))) {
+            //            alert("Invalid hours format");
+            //            return;
+            //        }
+            //    }
+            //} catch (e) {
+            //    alert("Invalid hours format");
+            //    return;
+            //}
+
+            $.ajax({
+                type: "POST",
+                url: "/Admin/SaveRule",
+                data: objectToSend,
+                cache: false,
+                success: function (result) {
+                    rulesList.add({
+                        id: result.Id,
+                        type: "restriction_rule",
+                        is_Ingreee: $('is_Ingreee-addField').val(),
+                        description: $('#description-addField').val(),
+                        local_addr: $('#local_addr-addField').val().split(","),
+                        active_hours: $('#active_hours-addField').val().split(","),
+                        enabled: $('active-addField').val()
+                    });
+
+                    $("#addRuleContainer").html("");
+
+                    $('#addRuleModal').modal('hide');
+                }
+            });
+        });
+
+        function validateIPaddress(inputText)  
+        {  
+            var format = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;  
+            if (format.test(inputText)){  
+                return true;
+            }
+            else  {  
+                return false;  
+            }  
+        }
+
+        function validateMACaddress(inputText) {
+            var format = /^([0-9A-F]{2}[:]){5}([0-9A-F]{2})$/;
+            if (format.test(inputText)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        function validateHour(inputText) {
+            var format = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/;
+            if (format.test(inputText)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    });
+</script>

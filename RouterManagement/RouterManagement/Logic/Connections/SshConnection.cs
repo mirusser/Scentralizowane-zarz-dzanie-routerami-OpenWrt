@@ -135,6 +135,7 @@ namespace RouterManagement.Logic.Connections
             }
 
             writeStream($"uci commit");
+            writeStream($"wifi");
         }
 
         public Dictionary<string, string> Send_UciShowFirewall()

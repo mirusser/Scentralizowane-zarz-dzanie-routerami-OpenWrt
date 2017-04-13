@@ -3,23 +3,29 @@
 }
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-4 text-center">
         <h2>Menu</h2>
         @using (Html.BeginForm("SendUciShow", "Admin", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
         {
             <div class="col-md-12">
-                <input type="submit" value="Show full configuration" class="btn btn-default" />
+                <input type="submit" value="Show full configuration" class="btn btn btn-primary col-md-12 col-xs-12" />
             </div>
         }
         @using (Html.BeginForm("Wireless", "Admin", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
         {
             <div class="col-md-12">
-                <input type="submit" value="Configure wireless" class="btn btn-default" />
+                <input type="submit" value="Configure wireless" class="btn btn btn-primary col-md-12 col-xs-12" />
+            </div>
+        }
+        @using (Html.BeginForm("Firewall", "Admin", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+        {
+            <div class="col-md-12">
+                <input type="submit" value="Configure firewall" class="btn btn btn-primary col-md-12 col-xs-12" />
             </div>
         }
     </div>
-    <div class="col-md-9">
-        <h2>Current system parameters</h2>
+    <div class="col-md-8">
+        <h2 class="text-center">Current system parameters</h2>
         <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus accumsan semper ex quis fringilla. Mauris eleifend, eros ut rutrum aliquam, sapien dolor tempor libero, ut interdum nulla odio ut odio. Integer sagittis ipsum sit amet justo consectetur vestibulum. Vivamus porttitor leo quam, quis eleifend velit auctor sit amet. Sed est ex, porttitor ac tincidunt eu, viverra at velit. Mauris ultrices suscipit condimentum. Nulla pellentesque tristique dolor vel fringilla. Cras tincidunt sagittis sapien eget ultricies. Mauris ac velit bibendum, finibus quam non, sollicitudin erat. Vivamus faucibus egestas metus, ac gravida neque tincidunt nec. Phasellus tristique semper auctor. Praesent semper, magna a cursus aliquet, enim lacus lobortis diam, sit amet vestibulum velit lorem id diam. Duis egestas tellus eu nunc pulvinar, non gravida leo luctus. Aenean ipsum magna, dictum sit amet suscipit et, lobortis at ante.
         </p>

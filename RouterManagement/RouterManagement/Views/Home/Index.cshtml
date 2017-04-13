@@ -2,6 +2,21 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="row">
-    @Html.Partial($"Partials/_Home")
+<div class="row text-center">
+    @if (!Request.IsAuthenticated)
+    {
+        <h1>You are not logged</h1>
+        @Html.Partial($"Partials/_Home")
+    }
+    else
+    {
+        <h1>You are logged</h1>
+        using (Html.BeginForm("Index", "Admin", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+        {
+            <div class="col-md-12">
+                <input type="submit" value="Go to admin panel" class="btn btn btn-primary col-md-12 col-xs-12" />
+            </div>
+        }
+    }
 </div>
+

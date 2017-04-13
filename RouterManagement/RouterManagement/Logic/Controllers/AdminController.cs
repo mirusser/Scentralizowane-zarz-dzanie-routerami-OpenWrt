@@ -16,8 +16,8 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult SendUciShow(int? selectedRouter = null)
         {
-            var sshConnection = new SshConnection("192.168.2.1", "root", "konopie1");
-            var currentConfiguratrion = sshConnection?.SendFake_UciShow();
+            var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
+            var currentConfiguratrion = sshConnection?.Send_UciShow();
             
             return View(currentConfiguratrion);
         }
@@ -27,7 +27,7 @@ namespace RouterManagement.Logic.Controllers
         public ActionResult Wireless(int? selectedRouter = null)
         {
             var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
-            var currentConfiguratrion = sshConnection?.SendFake_UciShowWireless();
+            var currentConfiguratrion = sshConnection?.Send_UciShowWireless();
 
             var configurationTrimmed = new SendUciShowWirelessViewModel
             {
@@ -71,7 +71,7 @@ namespace RouterManagement.Logic.Controllers
         public ActionResult Firewall(int? selectedRouter = null)
         {
             var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
-            var currentConfiguratrion = sshConnection?.SendFake_UciShowFirewall();
+            var currentConfiguratrion = sshConnection?.Send_UciShowFirewall();
 
             currentConfiguratrion = currentConfiguratrion.Where(c => c.Key.Contains("rule_")).ToDictionary(it => it.Key, it => it.Value);
             var firewallList = new List<FirewallViewModel>();
@@ -128,6 +128,27 @@ namespace RouterManagement.Logic.Controllers
             {
                 var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
                 sshConnection.Send_DeleteFirewallRule(ruleId);
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                return Json(false, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult AddRulePartial()
+        {
+            return PartialView("~/Views/Admin/PartialViews/_AddRule.cshtml");
+        }
+
+        [HttpPost]
+        public ActionResult SaveRule(AddFirewallRule rule)
+        {
+            try
+            {
+                //var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
+                //TODO add rule to router
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
             catch

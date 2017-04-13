@@ -33,7 +33,7 @@
                 <tr>
                     <td class="id">@f.Id</td>
                     <td class="type">@f.Type</td>
-                    <td class="is_Ingreee">@f.Is_Ingreee</td>
+                    <td class="isIngreee">@f.Is_Ingreee</td>
                     <td class="description">@f.Description</td>
                     @if (f.Local_addr != null)
                     {
@@ -68,36 +68,25 @@
 
 <script>
     var options = {
-        valueNames: ['key', 'value']
+        valueNames: ['id', 'type', 'is_Ingreee', 'description', 'local_addr', 'active_hours', 'enabled']
     };
 
     var rulesList = new List('rules', options);
 
     $(document).ready(function () {
-        //$(document).on('click', '#addRuleBtn', function () {
-        //    const objectToSend = {
-        //        Disabled: configurationsList.get("key", "Disabled")[0]._values.value,
-        //        Channel: configurationsList.get("key", "Channel")[0]._values.value,
-        //        SSID: configurationsList.get("key", "SSID")[0]._values.value,
-        //        Encryption: configurationsList.get("key", "Encryption")[0]._values.value,
-        //        Key: configurationsList.get("key", "Key")[0]._values.value,
-        //        Mode: configurationsList.get("key", "Mode")[0]._values.value,
-        //        Network: configurationsList.get("key", "Network")[0]._values.value
-        //    };
+        $(document).on('click', '#addRuleBtn', function () {
+            const url = $('#addRuleModal').data('url');
 
-        //    const url = $('#addRuleModal').data('url');
-
-        //    $.ajax({
-        //        type: "POST",
-        //        url: url,
-        //        data: objectToSend,
-        //        cache: false,
-        //        success: function (data) {
-        //            $('#addRuleContainer').html(data);
-        //            $('#addRuleModal').appendTo("body").modal('show');
-        //        }
-        //    });
-        //});
+            $.ajax({
+                type: "POST",
+                url: url,
+                cache: false,
+                success: function (data) {
+                    $('#addRuleContainer').html(data);
+                    $('#addRuleModal').appendTo("body").modal('show');
+                }
+            });
+        });
 
         //$(document).on('click', '.edit-item', function () {
         //    const publicationId = $(this).closest('tr').find('.id').text();
@@ -136,10 +125,10 @@
                 cache: false,
                 success: function (result) {
                     if (result)                    {
-                        rulesList.remove("id", publicationId);
+                        rulesList.remove("id", ruleId);
                     }
                     else {
-                        alert("There was a problem when deleting rule.")
+                        alert("There was a problem when deleting rule.");
                     }
                 }
             });
