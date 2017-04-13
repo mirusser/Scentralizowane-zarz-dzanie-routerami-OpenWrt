@@ -171,15 +171,15 @@ namespace RouterManagement.Logic.Connections
         {
             var id = getNewId();
 
-            SendCommand($"firewall.rule_{id}={rule.Type}");
-            SendCommand($"firewall.rule_{id}.is_ingress={Convert.ToInt32(rule.Is_Ingreee)}");
-            SendCommand($"firewall.rule_{id}.description={rule.Description}");
-            SendCommand($"firewall.rule_{id}.local_addr={rule.Local_addr}");
+            SendCommand($"uci set firewall.rule_{id}={rule.Type}");
+            SendCommand($"uci set firewall.rule_{id}.is_ingress={Convert.ToInt32(rule.Is_Ingreee)}");
+            SendCommand($"uci set firewall.rule_{id}.description={rule.Description}");
+            SendCommand($"uci set firewall.rule_{id}.local_addr={rule.Local_addr}");
             if (!string.IsNullOrEmpty(rule.Active_hours))
             {
-                SendCommand($"firewall.rule_{id}.active_hours={rule.Active_hours}");
+                SendCommand($"uci set firewall.rule_{id}.active_hours={rule.Active_hours}");
             }
-            SendCommand($"firewall.rule_{id}.enabled={Convert.ToInt32(rule.Enabled)}");
+            SendCommand($"uci set firewall.rule_{id}.enabled={Convert.ToInt32(rule.Enabled)}");
 
             SendCommand($"uci commit firewall");
 
@@ -285,7 +285,14 @@ namespace RouterManagement.Logic.Connections
                 catch { }
             }
 
-            return ids.Max() + 1;
+            if(ids.Any())
+            {
+                return ids.Max() + 1;
+            }
+            else
+            {
+                return 1;
+            }
         }
 
         #endregion

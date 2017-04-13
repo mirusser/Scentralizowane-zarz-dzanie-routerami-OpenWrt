@@ -147,6 +147,10 @@ namespace RouterManagement.Logic.Controllers
         [HttpPost]
         public ActionResult SaveRule(AddFirewallRule rule)
         {
+            if(rule.Active_hours == null)
+            {
+                rule.Active_hours = string.Empty;
+            }
             //test regex here: http://regexr.com/
             if (string.IsNullOrEmpty(rule.Description) ||
                 string.IsNullOrEmpty(rule.Type) ||
