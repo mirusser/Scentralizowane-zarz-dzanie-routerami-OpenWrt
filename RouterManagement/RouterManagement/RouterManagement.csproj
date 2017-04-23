@@ -202,15 +202,11 @@
     <Compile Include="Logic\Factories\Interfaces\IFactory.cs" />
     <Compile Include="Logic\Factories\Interfaces\IRepositoryFactory.cs" />
     <Compile Include="Logic\Factories\RepositoryFactory.cs" />
-    <Compile Include="Logic\Repositories\CommonSettingRepository.cs" />
-    <Compile Include="Logic\Repositories\ConfigSettingRepository.cs" />
+    <Compile Include="Logic\Repositories\DataContextUoW.cs" />
     <Compile Include="Logic\Repositories\GenericRepository.cs" />
-    <Compile Include="Logic\Repositories\Interfaces\ICommonSettingRepository.cs" />
-    <Compile Include="Logic\Repositories\Interfaces\IConfigSettingRepository.cs" />
+    <Compile Include="Logic\Repositories\Interfaces\IDataContextUoW.cs" />
     <Compile Include="Logic\Repositories\Interfaces\IGenericRepository.cs" />
-    <Compile Include="Logic\Repositories\Interfaces\IRepository.cs" />
-    <Compile Include="Logic\Repositories\Interfaces\IRouterAccesDataRepository.cs" />
-    <Compile Include="Logic\Repositories\RouterAccesDataRepository.cs" />
+    <Compile Include="Logic\Repositories\Interfaces\IUoW.cs" />
     <Compile Include="Migrations\201703251934385_InitialMigration.cs" />
     <Compile Include="Migrations\201703251934385_InitialMigration.Designer.cs">
       <DependentUpon>201703251934385_InitialMigration.cs</DependentUpon>

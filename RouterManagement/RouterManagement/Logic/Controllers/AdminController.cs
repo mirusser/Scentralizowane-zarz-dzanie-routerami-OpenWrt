@@ -24,6 +24,12 @@ namespace RouterManagement.Logic.Controllers
             return View(currentConfiguratrion);
         }
 
+        #region router acces data configuration
+
+
+
+        #endregion
+
         #region wireless
 
         public ActionResult Wireless(int? selectedRouter = null)
