@@ -190,18 +190,16 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Logic\Connections\Interfaces\ISshConnection.cs" />
+    <Compile Include="Logic\Connections\Routers.cs" />
     <Compile Include="Logic\Connections\SshConnection.cs" />
     <Compile Include="Logic\Controllers\AccountController.cs" />
     <Compile Include="Logic\Controllers\AdminController.cs" />
+    <Compile Include="Logic\Controllers\ApiController.cs" />
     <Compile Include="Logic\Controllers\HomeController.cs" />
     <Compile Include="Logic\Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Logic\Factories\Factory.cs" />
-    <Compile Include="Logic\Factories\Interfaces\IFactory.cs" />
-    <Compile Include="Logic\Factories\Interfaces\IRepositoryFactory.cs" />
-    <Compile Include="Logic\Factories\RepositoryFactory.cs" />
     <Compile Include="Logic\Repositories\DataContextUoW.cs" />
     <Compile Include="Logic\Repositories\GenericRepository.cs" />
     <Compile Include="Logic\Repositories\Interfaces\IDataContextUoW.cs" />
@@ -218,6 +216,10 @@
     <Compile Include="Migrations\201703261740573_AddLoginAndPasswordToRouterModel.cs" />
     <Compile Include="Migrations\201703261740573_AddLoginAndPasswordToRouterModel.Designer.cs">
       <DependentUpon>201703261740573_AddLoginAndPasswordToRouterModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704231741232_ChangeIpRouterFromIPAdressToString.cs" />
+    <Compile Include="Migrations\201704231741232_ChangeIpRouterFromIPAdressToString.Designer.cs">
+      <DependentUpon>201704231741232_ChangeIpRouterFromIPAdressToString.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Context\ApplicationDbContext.cs" />
@@ -298,10 +300,12 @@
     <Content Include="Views\Admin\PartialViews\_EditWirelessConfiguration.cshtml" />
     <Content Include="Views\Admin\Firewall.cshtml" />
     <Content Include="Views\Admin\PartialViews\_AddRule.cshtml" />
+    <Content Include="Views\Admin\PartialViews\_SelectRouter.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\Enums\" />
+    <Folder Include="Views\Api\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -320,6 +324,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201703261740573_AddLoginAndPasswordToRouterModel.resx">
       <DependentUpon>201703261740573_AddLoginAndPasswordToRouterModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704231741232_ChangeIpRouterFromIPAdressToString.resx">
+      <DependentUpon>201704231741232_ChangeIpRouterFromIPAdressToString.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

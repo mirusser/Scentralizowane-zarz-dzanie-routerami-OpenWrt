@@ -13,29 +13,48 @@ namespace RouterManagement.Logic.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            var names = Routers.GetRoutersNames();
+            return View(names);
         }
 
-        public ActionResult SendUciShow(int? selectedRouter = null)
+        public ActionResult SendUciShow(string name = null)
         {
-            var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
-            var currentConfiguratrion = sshConnection?.Send_UciShow();
+            if (name == null) name = Routers.GetFirstRouterName();
+            var sshConnection = Routers.GetConnectionByName(name);
+            if (sshConnection == null) return null;
+
+            var currentConfiguratrion = sshConnection.Send_UciShow();
             
             return View(currentConfiguratrion);
         }
 
         #region router acces data configuration
 
+        public ActionResult AllRouters()
+        {
+            return null;
+        }
 
+        public ActionResult AddRouter()
+        {
+            return null;
+        }
+
+        public ActionResult DeleteRouter()
+        {
+            return null;
+        }
 
         #endregion
 
         #region wireless
 
-        public ActionResult Wireless(int? selectedRouter = null)
+        public ActionResult Wireless(string name = null)
         {
-            var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
-            var currentConfiguratrion = sshConnection?.Send_UciShowWireless();
+            if (name == null) name = Routers.GetFirstRouterName();
+            var sshConnection = Routers.GetConnectionByName(name);
+            if (sshConnection == null) return null;
+            var currentConfiguratrion = sshConnection.Send_UciShowWireless();
 
             var configurationTrimmed = new SendUciShowWirelessViewModel
             {
@@ -58,11 +77,13 @@ namespace RouterManagement.Logic.Controllers
         }
 
         [HttpPost]
-        public ActionResult SaveWirelessPartial(SendUciShowWirelessViewModel config)
+        public ActionResult SaveWirelessPartial(SendUciShowWirelessViewModel config, string name)
         {
             try
             {
-                var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
+                var sshConnection = Routers.GetConnectionByName(name);
+                if (sshConnection == null) throw new Exception();
+
                 sshConnection.Send_UciSetWireless(config);
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
@@ -76,9 +97,11 @@ namespace RouterManagement.Logic.Controllers
 
         #region firewall
 
-        public ActionResult Firewall(int? selectedRouter = null)
+        public ActionResult Firewall(string name = null)  //TODO search for value "restriction_rule" and get rule name, then only select keys for this rule name
         {
-            var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
+            if (name == null) name = Routers.GetFirstRouterName();
+            var sshConnection = Routers.GetConnectionByName(name);
+            if (sshConnection == null) return null;
             var currentConfiguratrion = sshConnection?.Send_UciShowFirewall();
 
             currentConfiguratrion = currentConfiguratrion.Where(c => c.Key.Contains("rule_")).ToDictionary(it => it.Key, it => it.Value);
@@ -87,9 +110,7 @@ namespace RouterManagement.Logic.Controllers
             var n = 1;
             while (currentConfiguratrion.Any(c => c.Key.Contains($"firewall.rule_{n}")))
             {
-                var itemToAdd = new FirewallViewModel();
-
-                itemToAdd.Id = n;
+                var itemToAdd = new FirewallViewModel {Id = n};
 
                 if(currentConfiguratrion.ContainsKey($"firewall.rule_{n}"))
                 {
@@ -130,11 +151,13 @@ namespace RouterManagement.Logic.Controllers
         }
 
         [HttpPost]
-        public ActionResult RemoveRule(int ruleId)
+        public ActionResult RemoveRule(int ruleId, string name)
         {
             try
             {
-                var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
+                var sshConnection = Routers.GetConnectionByName(name);
+                if (sshConnection == null) throw new Exception();
+
                 sshConnection.Send_DeleteFirewallRule(ruleId);
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
@@ -151,7 +174,7 @@ namespace RouterManagement.Logic.Controllers
         }
 
         [HttpPost]
-        public ActionResult SaveRule(AddFirewallRule rule)
+        public ActionResult SaveRule(AddFirewallRule rule, string name)
         {
             if(rule.Active_hours == null)
             {
@@ -168,7 +191,8 @@ namespace RouterManagement.Logic.Controllers
 
             try
             {
-                var sshConnection = new SshConnection("192.168.1.1", "root", "konopie");
+                if (name == null) name = Routers.GetFirstRouterName();
+                var sshConnection = Routers.GetConnectionByName(name);
                 var newId = sshConnection.Send_SaveFirewallRule(rule);
                 return Json(new { id = newId, status = true }, JsonRequestBehavior.AllowGet);
             }

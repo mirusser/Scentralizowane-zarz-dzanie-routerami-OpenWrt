@@ -16,14 +16,13 @@ namespace RouterManagement.Tests.Connections
             var test1 = new SshConnection("192.168.1.1", "root", "konopie");
             var test2 = new SshConnection("192.168.1.1", 22, "root", "konopie");
 
-            var ip = IPAddress.Parse("192.168.1.1");
-            var test3 = new SshConnection(ip, "root", "konopie");
+            var test3 = new SshConnection("192.168.1.1", "root", "konopie");
 
             var router = new RouterAccesData
             {
                 Login = "root",
                 Password = "konopie",
-                RouterIp = ip,
+                RouterIp = "192.168.1.1",
                 Port = 22
             };
             var test4 = new SshConnection(router);

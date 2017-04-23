@@ -32,6 +32,11 @@ namespace RouterManagement.Logic.Repositories
             return dbSet.Any(where);
         }
 
+        public bool Any()
+        {
+            return dbSet.Any();
+        }
+
         public IQueryable<T> AsQueryable()
         {
             return dbSet.AsQueryable();

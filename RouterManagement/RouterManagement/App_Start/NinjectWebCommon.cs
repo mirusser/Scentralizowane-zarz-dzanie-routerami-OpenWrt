@@ -3,9 +3,10 @@ using System.Web;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using Ninject;
 using Ninject.Web.Common;
+using RouterManagement.Logic.Connections.Interfaces;
 using RouterManagement.Models.Context;
-using RouterManagement.Logic.Factories;
-using RouterManagement.Logic.Factories.Interfaces;
+using RouterManagement.Logic.Connections;
+using RouterManagement.Logic.Repositories.Interfaces;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(RouterManagement.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(RouterManagement.App_Start.NinjectWebCommon), "Stop")]
@@ -63,7 +64,7 @@ namespace RouterManagement.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<ApplicationDbContext>().To<ApplicationDbContext>().InRequestScope();
-            kernel.Bind<IRepositoryFactory>().To<RepositoryFactory>().InRequestScope();
+            kernel.Bind<ISshConnection>().To<SshConnection>().InRequestScope();
         }        
     }
 }

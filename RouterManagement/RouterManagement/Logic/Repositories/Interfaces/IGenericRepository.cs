@@ -12,6 +12,8 @@ namespace RouterManagement.Logic.Repositories.Interfaces
 
         bool Any(Expression<Func<T, bool>> where);
 
+        bool Any();
+
         IQueryable<T> AsQueryable();
 
         void Delete(T entity);

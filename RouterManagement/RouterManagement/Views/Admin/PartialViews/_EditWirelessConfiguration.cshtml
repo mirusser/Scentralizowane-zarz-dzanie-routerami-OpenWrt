@@ -1,4 +1,8 @@
 ﻿@model RouterManagement.Models.ViewModels.SendUciShowWirelessViewModel
+    
+@{
+    var routerName = HttpContext.Current.Request["name"] ?? RouterManagement.Logic.Connections.Routers.GetFirstRouterName();
+}
 
 <div class="modal-content">
     <div class="modal-header">
@@ -131,8 +135,6 @@
 </div>
 <script>
     $(document).ready(function () {
-        //$(".chosenAddTeacher").chosen({ width: "95%" });
-
         $("#addPublication-btn").click(function () {
             const objectToSend = {
                 Disabled: $('#disabled-field').val(),
@@ -157,7 +159,11 @@
             $.ajax({
                 type: "POST",
                 url: "/Admin/SaveWirelessPartial",
-                data: objectToSend,
+                data:
+                {
+                    config: objectToSend,
+                    name: '@routerName'
+                },
                 cache: false,
                 success: function (data) {
                     if (data) {

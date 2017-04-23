@@ -1,0 +1,33 @@
+﻿<div>
+    <div class="container">
+        <h4 class="col-md-2">Selected router:</h4>
+        <select class="form-control col-md-2" id="routersSelect"></select>
+        <button type="button" class="btn btn-info col-md-2" id="changeRouterButton">Select</button>
+    </div>
+    <hr>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "POST",
+            url: "/Api/GetRouterNames",
+            cache: false,
+            success: function (result) {
+                $.each(result, function (i, item) {
+                    $('#routersSelect').append($('<option>',
+                        {
+                            value: item,
+                            text: item
+                        }));
+                });
+
+                $('#routersSelect').val("@RouterManagement.Logic.Connections.Routers.GetFirstRouterName()");
+            }
+        });
+
+        $("#changeRouterButton").click(function () {
+            window.location.replace(`@HttpContext.Current.Request.Url.AbsolutePath?name=${$('#routersSelect').val()}`);
+        });
+    });
+</script>

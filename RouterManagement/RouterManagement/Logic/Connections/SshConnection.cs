@@ -53,13 +53,13 @@ namespace RouterManagement.Logic.Connections
         {
             if (routerAccesData.Port == null || routerAccesData.Port == 0)
             {
-                sshclient = new SshClient(routerAccesData.RouterIp.ToString(),
+                sshclient = new SshClient(routerAccesData.RouterIp,
                     routerAccesData.Login,
                     routerAccesData.Password);
             }
             else
             {
-                sshclient = new SshClient(routerAccesData.RouterIp.ToString(),
+                sshclient = new SshClient(routerAccesData.RouterIp,
                     Convert.ToInt32(routerAccesData.Port),
                     routerAccesData.Login,
                     routerAccesData.Password);
@@ -83,9 +83,9 @@ namespace RouterManagement.Logic.Connections
 
         public Dictionary<string, string> SendFake_UciShow()
         {
-            using (WebClient client = new WebClient())
+            using (var client = new WebClient())
             {
-                string answer = client.DownloadString("http://wklej.org/id/3085238/txt/");
+                var answer = client.DownloadString("http://wklej.org/id/3085238/txt/");
 
                 var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                 var entriesAsDictionary = entriesTable
@@ -107,7 +107,7 @@ namespace RouterManagement.Logic.Connections
         {
             using (WebClient client = new WebClient())
             {
-                string answer = client.DownloadString("http://wklej.org/id/3085279/txt/");
+                var answer = client.DownloadString("http://wklej.org/id/3085279/txt/");
 
                 var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                 var entriesAsDictionary = entriesTable
@@ -161,27 +161,25 @@ namespace RouterManagement.Logic.Connections
 
         public void Send_DeleteFirewallRule(int ruleId)
         {
-            SendCommand($"uci delete firewall.rule_{ruleId}");
-            SendCommand($"uci commit firewall");
-
-            //TODO change all next rules numbers to -1
+            writeStream($"uci delete firewall.rule_{ruleId}");
+            writeStream($"uci commit");
         }
 
         public int Send_SaveFirewallRule(AddFirewallRule rule)
         {
             var id = getNewId();
 
-            SendCommand($"uci set firewall.rule_{id}={rule.Type}");
-            SendCommand($"uci set firewall.rule_{id}.is_ingress={Convert.ToInt32(rule.Is_Ingreee)}");
-            SendCommand($"uci set firewall.rule_{id}.description={rule.Description}");
-            SendCommand($"uci set firewall.rule_{id}.local_addr={rule.Local_addr}");
+            writeStream($"uci set firewall.rule_{id}={rule.Type}");
+            writeStream($"uci set firewall.rule_{id}.is_ingress={Convert.ToInt32(rule.Is_Ingreee)}");
+            writeStream($"uci set firewall.rule_{id}.description={rule.Description}");
+            writeStream($"uci set firewall.rule_{id}.local_addr={rule.Local_addr}");
             if (!string.IsNullOrEmpty(rule.Active_hours))
             {
-                SendCommand($"uci set firewall.rule_{id}.active_hours={rule.Active_hours}");
+                writeStream($"uci set firewall.rule_{id}.active_hours={rule.Active_hours}");
             }
-            SendCommand($"uci set firewall.rule_{id}.enabled={Convert.ToInt32(rule.Enabled)}");
+            writeStream($"uci set firewall.rule_{id}.enabled={Convert.ToInt32(rule.Enabled)}");
 
-            SendCommand($"uci commit firewall");
+            writeStream($"uci commit firewall");
 
             return id;
         }
@@ -275,7 +273,7 @@ namespace RouterManagement.Logic.Connections
         {
             var answer = Send_UciShowFirewall();
             var rules = answer.Select(it => it.Key).Where(k => k.Contains("firewall.rule_"));
-            List<int> ids = new List<int>();
+            var ids = new List<int>();
             foreach (var r in rules)
             {
                 try
@@ -285,14 +283,8 @@ namespace RouterManagement.Logic.Connections
                 catch { }
             }
 
-            if(ids.Any())
-            {
-                return ids.Max() + 1;
-            }
-            else
-            {
-                return 1;
-            }
+
+            return ids.Any() ? ids.Max() + 1 : 1;
         }
 
         #endregion

@@ -4,11 +4,14 @@
 
 @{
     ViewBag.Title = "Firewall";
+    var routerName = HttpContext.Current.Request["name"] ?? RouterManagement.Logic.Connections.Routers.GetFirstRouterName();
 }
 
 <h2>Current firewall rules</h2>
 <hr>
 <div id="rules">
+    @Html.Partial("PartialViews/_SelectRouter")
+
     <table class="table table-striped table-bordered">
         <thead class="thead-inverse">
             <tr>
@@ -33,7 +36,7 @@
                     <td class="isIngreee">@f.Is_Ingreee</td>
                     <td class="description">@f.Description</td>
                     @if (f.Local_addr != null)
-                    {
+                {
                         <td class="local_addr">@String.Join(Environment.NewLine, f.Local_addr)</td>
                     }
                     else
@@ -42,7 +45,7 @@
                     }
 
                     @if (f.Active_hours != null)
-                    {
+                {
                         <td class="active_hours">@String.Join(Environment.NewLine, f.Active_hours)</td>
                     }
                     else
@@ -118,10 +121,13 @@
             $.ajax({
                 type: "POST",
                 url: "/Admin/RemoveRule",
-                data: { 'ruleId': ruleId },
+                data: {
+                    ruleId: ruleId,
+                    name: '@routerName'
+                },
                 cache: false,
                 success: function (result) {
-                    if (result)                    {
+                    if (result) {
                         rulesList.remove("id", ruleId);
                     }
                     else {
