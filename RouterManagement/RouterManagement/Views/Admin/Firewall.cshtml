@@ -36,7 +36,7 @@
                     <td class="isIngreee">@f.Is_Ingreee</td>
                     <td class="description">@f.Description</td>
                     @if (f.Local_addr != null)
-                {
+                    {
                         <td class="local_addr">@String.Join(Environment.NewLine, f.Local_addr)</td>
                     }
                     else
@@ -45,7 +45,7 @@
                     }
 
                     @if (f.Active_hours != null)
-                {
+                    {
                         <td class="active_hours">@String.Join(Environment.NewLine, f.Active_hours)</td>
                     }
                     else

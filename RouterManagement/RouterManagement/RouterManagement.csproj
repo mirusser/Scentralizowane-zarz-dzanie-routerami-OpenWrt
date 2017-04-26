@@ -200,6 +200,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Logic\DataAnnotations\EnsureOneElementAttribute.cs" />
+    <Compile Include="Logic\DataAnnotations\NotNullAttribute.cs" />
+    <Compile Include="Logic\DataAnnotations\StringNotNullNotEmptyAttribute.cs" />
     <Compile Include="Logic\Repositories\DataContextUoW.cs" />
     <Compile Include="Logic\Repositories\GenericRepository.cs" />
     <Compile Include="Logic\Repositories\Interfaces\IDataContextUoW.cs" />
@@ -228,7 +231,8 @@
     <Compile Include="Models\CommonSetting.cs" />
     <Compile Include="Models\ConfigSetting.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\ViewModels\AddFirewallRule.cs" />
+    <Compile Include="Models\ViewModels\AddFirewallRuleViewModel.cs" />
+    <Compile Include="Models\ViewModels\AddRouterViewModel.cs" />
     <Compile Include="Models\ViewModels\FirewallViewModel.cs" />
     <Compile Include="Models\ViewModels\ManageViewModels.cs" />
     <Compile Include="Models\RouterAccesData.cs" />
@@ -305,6 +309,7 @@
     <Content Include="Views\Admin\PartialViews\_SelectRouter.cshtml" />
     <Content Include="Views\Admin\NoRoutersError.cshtml" />
     <Content Include="Views\Admin\AllRouters.cshtml" />
+    <Content Include="Views\Admin\PartialViews\_AddRouter.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

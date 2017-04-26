@@ -149,7 +149,7 @@ namespace RouterManagement.Logic.Connections
             writeStream($"uci commit");
         }
 
-        public int Send_SaveFirewallRule(AddFirewallRule rule)
+        public int Send_SaveFirewallRule(AddFirewallRuleViewModel rule)
         {
             var id = getNewId();
 

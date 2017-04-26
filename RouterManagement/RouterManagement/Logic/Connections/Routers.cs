@@ -10,7 +10,7 @@ namespace RouterManagement.Logic.Connections
 {
     public static class Routers
     {
-        private static List<RouterOnListViewModel> routerDataList = new List<RouterOnListViewModel>();
+        private static readonly List<RouterOnListViewModel> RouterDataList = new List<RouterOnListViewModel>();
 
         public static void CreateNewConnection(RouterAccesData routerAccesData)
         {
@@ -25,10 +25,14 @@ namespace RouterManagement.Logic.Connections
 
             var connection = new SshConnection(routerAccesData);
 
-            RouterOnListViewModel routerData = new RouterOnListViewModel();
-            routerData.IsActive = connection.IsConnected();
-            routerData.Name = routerAccesData.Name;
-            routerData.SshConnection = connection;
+            var routerData = new RouterOnListViewModel
+            {
+                IsActive = connection.IsConnected(),
+                Name = routerAccesData.Name,
+                SshConnection = connection
+            };
+
+            RouterDataList.Add(routerData);
         }
 
         public static void Initialize()
@@ -41,10 +45,14 @@ namespace RouterManagement.Logic.Connections
                     {
                         var connection = new SshConnection(data);
 
-                        RouterOnListViewModel routerData = new RouterOnListViewModel();
-                        routerData.IsActive = connection.IsConnected();
-                        routerData.Name = data.Name;
-                        routerData.SshConnection = connection;
+                        var routerData = new RouterOnListViewModel
+                        {
+                            IsActive = connection.IsConnected(),
+                            Name = data.Name,
+                            SshConnection = connection
+                        };
+
+                        RouterDataList.Add(routerData);
                     });
                 }
             }
@@ -56,19 +64,20 @@ namespace RouterManagement.Logic.Connections
 
             using (var uow = new DataContextUoW(new RouterManagementEntities()))
             {
-                var allRoutersFromDb = uow.RouterAccesDatasRepository.GetAll();
-                foreach (var r in allRoutersFromDb)
+                Parallel.ForEach(uow.RouterAccesDatasRepository.GetAll(), r =>
                 {
+                    var currentRouter = RouterDataList.FirstOrDefault(it => it.Name == r.Name);
+
                     allRouters.Add(new RouterActivityDataViewModel
                     {
                         Name = r.Name,
-                        IsActive = (routerDataList.FirstOrDefault(it =>it.Name == r.Name) == null) ? false : true,
+                        IsActive = currentRouter != null && currentRouter.IsActive,
                         RouterIp = r.RouterIp,
                         Port = r.Port,
                         Login = r.Login,
                         Password = r.Password
                     });
-                }
+                });
             }
 
             return allRouters;
@@ -76,21 +85,14 @@ namespace RouterManagement.Logic.Connections
 
         public static void UpdateRoutersInfo()
         {
-            routerDataList.Clear();
+            RouterDataList.Clear();
             Initialize();
         }
 
         public static SshConnection GetConnectionByName(string name)
         {
-            var searchedRouter = routerDataList.FirstOrDefault(it => it.Name == name);
-            if(searchedRouter != null)
-            {
-                return searchedRouter.SshConnection;
-            }
-            else
-            {
-                return null;
-            }
+            var searchedRouter = RouterDataList.FirstOrDefault(it => it.Name == name);
+            return searchedRouter?.SshConnection;
         }
 
         public static void DeleteConnectionByName(string name)
@@ -106,27 +108,32 @@ namespace RouterManagement.Logic.Connections
                 uow.Save();
             }
 
-            var routerToRemove = routerDataList.FirstOrDefault(it => it.Name == name);
-            routerDataList.Remove(routerToRemove);
+            var routerToRemove = RouterDataList.First(it => it.Name == name);
+            RouterDataList.Remove(routerToRemove);
         }
 
-        public static ICollection<string> GetRoutersNames()
+        public static IEnumerable<string> GetAllRoutersNames()
         {
-            return routerDataList.Select(it => it.Name).OrderBy(x => x).ToList();
+            return RouterDataList.Select(it => it.Name);
+        }
+
+        public static IEnumerable<string> GetOnlineRoutersNames()
+        {
+            return RouterDataList.Where(it => it.IsActive).Select(it => it.Name);
+        }
+
+        public static bool CheckIfRouterIsConnected(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return false;
+            var router = RouterDataList.FirstOrDefault(it => it.Name == name);
+            return router != null && router.IsActive;
         }
 
         public static string GetFirstRouterName()
         {
-            var searchedRouter = routerDataList.FirstOrDefault(it => it.IsActive == true);
+            var searchedRouter = RouterDataList.FirstOrDefault(it => it.IsActive);
 
-            if(searchedRouter == null)
-            {
-                return null;
-            }
-            else
-            {
-                return searchedRouter.Name;
-            }
+            return searchedRouter?.Name;
         }
     }
 }

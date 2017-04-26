@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using RouterManagement.Logic.Connections;
 using RouterManagement.Models.ViewModels;
 using System.Text.RegularExpressions;
+using RouterManagement.Models;
 
 namespace RouterManagement.Logic.Controllers
 {
@@ -13,7 +14,7 @@ namespace RouterManagement.Logic.Controllers
     {
         public ActionResult Index()
         {
-            var names = Routers.GetRoutersNames();
+            var names = Routers.GetOnlineRoutersNames();
             return View(names);
         }
 
@@ -40,17 +41,44 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult AddRouterPartial()
         {
+            var allRoutersNames = Routers.GetAllRoutersNames();
+            return PartialView("~/Views/Admin/PartialViews/_AddRouter.cshtml", allRoutersNames);
+        }
 
+        public ActionResult SaveRouter(AddRouterViewModel router)
+        {
+            if (!ModelState.IsValid) return Json(new { status = "false" }, JsonRequestBehavior.AllowGet);
 
-            return null;
+            var routerAccesData = new RouterAccesData
+            {
+                Name = router.Name,
+                RouterIp = router.RouterIp,
+                Port = router.Port,
+                Login = router.Login,
+                Password = router.Password
+            };
+
+            Routers.CreateNewConnection(routerAccesData);
+
+            var isConnected = Routers.CheckIfRouterIsConnected(router.Name);
+
+            return Json(new { status = "true", isConnected = isConnected.ToString() }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public ActionResult DeleteRouter(string name)
+        public ActionResult RemoveRouter(string name)
         {
-            Routers.DeleteConnectionByName(name);
+            if(string.IsNullOrEmpty(name)) Json(false, JsonRequestBehavior.AllowGet);
+            try
+            {
+                Routers.DeleteConnectionByName(name);
+            }
+            catch
+            {
+                return Json(false, JsonRequestBehavior.AllowGet);
+            }
 
-            return null;
+            return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         #endregion
@@ -184,7 +212,7 @@ namespace RouterManagement.Logic.Controllers
         }
 
         [HttpPost]
-        public ActionResult SaveRule(AddFirewallRule rule, string name)
+        public ActionResult SaveRule(AddFirewallRuleViewModel rule, string name)
         {
             if(rule.Active_hours == null)
             {

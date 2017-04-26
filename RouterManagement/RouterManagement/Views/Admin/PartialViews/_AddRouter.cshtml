@@ -1,0 +1,137 @@
+﻿@model IEnumerable<string>
+@{
+    var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+}
+
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add router</h4>
+    </div>
+    <div class="modal-body">
+        <p></p>
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    <p>Friendly name</p>
+                    <input type="text" class="form-control" id="name-addField" placeholder="router in salon" />
+                </td>
+                <td>
+                    <p>Ip/host adress</p>
+                    <input type="text" class="form-control" id="routerIp-addField" placeholder="192.168.1.1" />
+                </td>
+                <td>
+                    <p>Port</p>
+                    <input type="text" class="form-control" id="port-addField" placeholder="22" />
+                </td>
+                <td>
+                    <p>Login</p>
+                    <input type="text" class="form-control" id="login-addField" value="root" placeholder="root" />
+                </td>
+                <td>
+                    <p>Password</p>
+                    <input type="password" class="form-control" id="password-addField" />
+                </td>
+                <td>
+                    <button id="addRouter-btn" class="btn btn-success">Add</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#addRouter-btn").click(function () {
+            const objectToSend = {
+                Name: $('#name-addField').val(),
+                RouterIp: $('#routerIp-addField').val(),
+                Port: $('#port-addField').val(),
+                Login: $('#login-addField').val(),
+                Password: $('#password-addField').val(),
+            };
+
+            if (objectToSend.Name.length === 0) {
+                alert("You have to type router name");
+                return;
+            }
+
+            const usedNames = [];
+            @foreach (var name in Model)
+            {
+                @:usedNames.push("@name");
+            }
+            if (contains(usedNames, objectToSend.Name)) {
+                alert("This name is in use");
+                return;
+            }
+
+            if (!validateIpOrDomain(objectToSend.RouterIp)) {
+                alert("You have typed adresses in not proper format");
+                return;
+            }
+
+            if (!validateNumberOrEmpty(objectToSend.Port)) {
+                alert("You have typed adresses in not proper format");
+                return;
+            }
+
+            if (objectToSend.Login.length === 0) {
+                alert("You have to name description");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/Admin/SaveRouter",
+                data:
+                {
+                    router: objectToSend
+                },
+                cache: false,
+                success: function (result) {
+                    if (result.status == "true") {
+                        routersList.add({
+                            name: $('#name-addField').val(),
+                            isActive: result.isConnected,
+                            routerIp: $('#routerIp-addField').val(),
+                            port: $('#port-addField').val(),
+                            login: $('#login-addField').val(),
+                            password: $('#password-addField').val(),
+                        });
+                    }
+                    else {
+                        alert("Error when adding new router occured");
+                    }
+
+                    $("#addRouterContainer").html("");
+
+                    $('#addRouterModal').modal('hide');
+                }
+            });
+        });
+
+        function validateIpOrDomain(inputText) {
+            const format = /^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$/;
+            if (inputText.match(format) != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        function validateNumberOrEmpty(inputText) {
+            const format = /^(\s*|\d+)$/;
+            if (inputText.match(format) != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    });
+</script>

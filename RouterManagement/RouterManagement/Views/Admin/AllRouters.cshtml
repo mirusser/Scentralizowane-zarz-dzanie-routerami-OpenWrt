@@ -6,36 +6,36 @@
     ViewBag.Title = "Routers";
 }
 
-<h2>Current firewall rules</h2>
+<h2>All routers added</h2>
 <hr>
 <div id="routers">
     <table class="table table-striped table-bordered">
         <thead class="thead-inverse">
-            <tr>
-                <th class="sort" data-sort="Name">Name</th>
-                <th class="sort" data-sort="IsActive">Is online?</th>
-                <th class="sort" data-sort="RouterIp">Ip adress</th>
-                <th class="sort" data-sort="Port">Port</th>
-                <th class="sort" data-sort="Login">Login</th>
-                <th class="sort" data-sort="Password">Password?</th>
-                <th colspan="2">
-                    <input type="text" class="search" placeholder="Search entity" />
-                </th>
-            </tr>
+        <tr>
+            <th class="sort" data-sort="Name">Name</th>
+            <th class="sort" data-sort="RouterIp">Ip adress</th>
+            <th class="sort" data-sort="Port">Port</th>
+            <th class="sort" data-sort="Login">Login</th>
+            <th class="sort" data-sort="Password">Password?</th>
+            <th class="sort" data-sort="IsActive">Is online?</th>
+            <th colspan="2">
+                <input type="text" class="search" placeholder="Search entity"/>
+            </th>
+        </tr>
         </thead>
         <tbody class="list">
             @foreach (var r in Model)
             {
                 <tr>
                     <td class="name">@r.Name</td>
-                    <td class="isActive">@r.IsActive</td>
                     <td class="routerIp">@r.RouterIp</td>
                     <td class="port">@r.Port</td>
                     <td class="login">@r.Login</td>
                     <td class="password">@r.Password</td>
+                    <td class="isActive">@r.IsActive</td>
 
-                    <td class="edit"><button class="edit-item btn btn-primary">Edit</button></td>
-                    <td class="remove"><button class="remove-item btn btn-danger">Delete</button></td>
+                    <td><button class="btn btn-primary edit-item">Edit</button></td>
+                    <td><button class="btn btn-danger remove-item">Delete</button></td>
                 </tr>
             }
         </tbody>
@@ -49,7 +49,7 @@
 
 <script>
     var options = {
-        valueNames: ['name', 'isActive', 'routerIp', 'port', 'login', 'password']
+        valueNames: ['name', 'routerIp', 'port', 'login', 'password', 'isActive']
     };
 
     var routersList = new List('routers', options);
@@ -98,23 +98,33 @@
         //});
 
         $(document).on('click', '.remove-item', function () {
-            var ruleId = $(this).closest('tr').find('.id').text();
+            const name = $(this).closest('tr').find('.name').text();
             $.ajax({
                 type: "POST",
                 url: "/Admin/RemoveRouter",
                 data: {
-                    name: 'router aaa'
+                    name: name
                 },
                 cache: false,
                 success: function (result) {
                     if (result) {
-                        rulesList.remove("id", ruleId);
+                        routersList.remove('name', name);
                     }
                     else {
-                        alert("There was a problem when deleting Router.");
+                        alert("There was a problem when deleting router.");
                     }
                 }
             });
         });
     });
+
+    function contains(a, obj) {
+        var i = a.length;
+        while (i--) {
+            if (a[i] == obj) {
+                return true;
+            }
+        }
+        return false;
+    }
 </script>

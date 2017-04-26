@@ -1,4 +1,4 @@
-﻿@model ICollection<string>
+﻿@model IEnumerable<string>
 
 @{
     ViewBag.Title = "Admin panel";
@@ -7,6 +7,12 @@
 <div class="row">
     <div class="col-md-4 text-center">
         <h2>Menu</h2>
+        @using (Html.BeginForm("AllRouters", "Admin", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+        {
+            <div class="col-md-12">
+                <input type="submit" value="Manage saved routers" class="btn btn btn-primary col-md-12 col-xs-12" />
+            </div>
+        }
         @using (Html.BeginForm("SendUciShow", "Admin", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
         {
             <div class="col-md-12">

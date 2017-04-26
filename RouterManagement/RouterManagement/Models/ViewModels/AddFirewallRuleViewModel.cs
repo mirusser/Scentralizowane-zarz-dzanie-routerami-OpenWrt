@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Web;
-
-namespace RouterManagement.Models.ViewModels
+﻿namespace RouterManagement.Models.ViewModels
 {
-    public class AddFirewallRule
+    public class AddFirewallRuleViewModel
     {
         public string Type { get; set; }
         public bool Is_Ingreee { get; set; }
