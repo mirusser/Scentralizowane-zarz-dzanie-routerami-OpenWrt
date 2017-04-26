@@ -19,7 +19,8 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult SendUciShow(string name = null)
         {
-            if (name == null) name = Routers.GetFirstRouterName();
+            name = name ?? Routers.GetFirstRouterName();
+            if (name == null) return View("~/Views/Admin/NoRoutersError.cshtml");
             var sshConnection = Routers.GetConnectionByName(name);
             if (sshConnection == null) return null;
 
@@ -51,7 +52,8 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult Wireless(string name = null)
         {
-            if (name == null) name = Routers.GetFirstRouterName();
+            name = name ?? Routers.GetFirstRouterName();
+            if (name == null) return View("~/Views/Admin/NoRoutersError.cshtml");
             var sshConnection = Routers.GetConnectionByName(name);
             if (sshConnection == null) return null;
             var currentConfiguratrion = sshConnection.Send_UciShowWireless();
@@ -99,7 +101,8 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult Firewall(string name = null)  //TODO search for value "restriction_rule" and get rule name, then only select keys for this rule name
         {
-            if (name == null) name = Routers.GetFirstRouterName();
+            name = name ?? Routers.GetFirstRouterName();
+            if (name == null) return View("~/Views/Admin/NoRoutersError.cshtml");
             var sshConnection = Routers.GetConnectionByName(name);
             if (sshConnection == null) return null;
             var currentConfiguratrion = sshConnection?.Send_UciShowFirewall();

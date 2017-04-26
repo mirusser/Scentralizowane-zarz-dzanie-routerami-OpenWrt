@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RouterManagement.Logic.Repositories;
@@ -9,7 +10,8 @@ namespace RouterManagement.Logic.Connections
 {
     public static class Routers
     {
-        private static Dictionary<string, SshConnection> routersDict = new Dictionary<string, SshConnection>();
+        private static Dictionary<string, SshConnection> onlineRoutersDict = new Dictionary<string, SshConnection>();
+        private static Dictionary<string, SshConnection> offlineRoutersDict = new Dictionary<string, SshConnection>();
 
         public static void CreateNewConnection(RouterAccesData routerAccesData)
         {
@@ -23,13 +25,19 @@ namespace RouterManagement.Logic.Connections
             }
 
             var connection = new SshConnection(routerAccesData);
-
-            routersDict.Add(routerAccesData.Name, connection);
+            if (connection.IsConnected())
+            {
+                onlineRoutersDict.Add(routerAccesData.Name, connection);
+            }
+            else
+            {
+                offlineRoutersDict.Add(routerAccesData.Name, connection);
+            }
         }
 
         public static void Initialize()
         {
-            if (routersDict.Count > 0) routersDict = new Dictionary<string, SshConnection>();
+            if (onlineRoutersDict.Count > 0) onlineRoutersDict = new Dictionary<string, SshConnection>();
 
             using (var uow = new DataContextUoW(new RouterManagementEntities()))
             {
@@ -38,7 +46,15 @@ namespace RouterManagement.Logic.Connections
                     Parallel.ForEach(uow.RouterAccesDatasRepository.GetAll(), data =>
                     {
                         var connection = new SshConnection(data);
-                        routersDict.Add(data.Name, connection);
+
+                        if (connection.IsConnected())
+                        {
+                            onlineRoutersDict.Add(data.Name, connection);
+                        }
+                        else
+                        {
+                            offlineRoutersDict.Add(data.Name, connection);
+                        }
                     });
                 }
             }
@@ -47,7 +63,7 @@ namespace RouterManagement.Logic.Connections
         public static SshConnection GetConnectionByName(string name)
         {
             SshConnection connection = null;
-            routersDict.TryGetValue(name, out connection);
+            onlineRoutersDict.TryGetValue(name, out connection);
             return connection;
         }
 
@@ -64,17 +80,17 @@ namespace RouterManagement.Logic.Connections
                 uow.Save();
             }
 
-            routersDict.Remove(name);
+            onlineRoutersDict.Remove(name);
         }
 
         public static ICollection<string> GetRoutersNames()
         {
-            return routersDict.Keys.OrderBy(x => x).ToList();
+            return onlineRoutersDict.Keys.OrderBy(x => x).ToList();
         }
 
         public static string GetFirstRouterName()
         {
-            return routersDict.FirstOrDefault().Key;
+            return onlineRoutersDict.FirstOrDefault().Key;
         }
     }
 }

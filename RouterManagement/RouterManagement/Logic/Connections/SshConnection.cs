@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using Renci.SshNet;
@@ -27,30 +28,37 @@ namespace RouterManagement.Logic.Connections
 
         public SshConnection(IPAddress adresIp, int port, string username, string password)
         {
+            if (!tryPingIp(adresIp.ToString())) return;
             sshclient = new SshClient(adresIp.ToString(), port, username, password);
-            connect();
+            Connect();
         }
 
         public SshConnection(IPAddress adresIp, string username, string password)
         {
+            if (!tryPingIp(adresIp.ToString())) return;
             sshclient = new SshClient(adresIp.ToString(), username, password);
-            connect();
+            Connect();
         }
 
         public SshConnection(string adresIp, string username, string password)
         {
+            if (!tryPingIp(adresIp.ToString())) return;
             sshclient = new SshClient(adresIp, username, password);
-            connect();
+            Connect();
         }
 
         public SshConnection(string adresIp, int port, string username, string password)
         {
+            if (!tryPingIp(adresIp.ToString())) return;
             sshclient = new SshClient(adresIp, port, username, password);
-            connect();
+            Connect();
         }
 
         public SshConnection(RouterAccesData routerAccesData)
         {
+            if (!tryPingIp(routerAccesData.RouterIp)) return;
+
+
             if (routerAccesData.Port == null || routerAccesData.Port == 0)
             {
                 sshclient = new SshClient(routerAccesData.RouterIp,
@@ -64,14 +72,35 @@ namespace RouterManagement.Logic.Connections
                     routerAccesData.Login,
                     routerAccesData.Password);
             }
-            connect();
+            Connect();
         }
 
         #endregion
 
+        public void Connect()
+        {
+            try
+            {
+                sshclient.Connect();
+            }
+            catch
+            {
+                return;
+            }
+
+            stream = sshclient.CreateShellStream("cmd", 80, 24, 800, 600, 1024);
+            reader = new StreamReader(stream);
+            writer = new StreamWriter(stream)
+            {
+                AutoFlush = true
+            };
+
+            SendCommand("reset");
+        }
+
         public bool IsConnected()
         {
-            return sshclient.IsConnected;
+            return sshclient != null && sshclient.IsConnected;
         }
 
         public Dictionary<string, string> Send_UciShow()
@@ -209,6 +238,22 @@ namespace RouterManagement.Logic.Connections
 
         #region private methods
 
+        private static bool tryPingIp(string ipAdress)
+        {
+            if (string.IsNullOrEmpty(ipAdress)) return false;
+
+            using (var ping = new Ping())
+            {
+                var pingReply = ping.Send(ipAdress);
+                if (pingReply == null || pingReply.Status != IPStatus.Success)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private static Dictionary<string, string> parseAnswerToDictionary(string answer)
         {
             //remove first line - command sent to router
@@ -228,23 +273,6 @@ namespace RouterManagement.Logic.Connections
                 .ToDictionary(split => split[0], split => split[1]);
 
             return entriesAsDictionary;
-        }
-
-        private void connect()
-        {
-            try
-            {
-                sshclient.Connect();
-                stream = sshclient.CreateShellStream("cmd", 80, 24, 800, 600, 1024);
-                reader = new StreamReader(stream);
-                writer = new StreamWriter(stream)
-                {
-                    AutoFlush = true
-                };
-
-                SendCommand("reset");
-            }
-            catch { }
         }
 
         private void writeStream(string cmd)

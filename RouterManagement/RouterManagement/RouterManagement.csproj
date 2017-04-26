@@ -301,6 +301,7 @@
     <Content Include="Views\Admin\Firewall.cshtml" />
     <Content Include="Views\Admin\PartialViews\_AddRule.cshtml" />
     <Content Include="Views\Admin\PartialViews\_SelectRouter.cshtml" />
+    <Content Include="Views\Admin\NoRoutersError.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
