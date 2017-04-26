@@ -17,7 +17,7 @@ namespace RouterManagement.Logic.Connections
     {
         #region properties
 
-        private readonly SshClient sshclient;
+        public SshClient sshclient { get; }
         private ShellStream stream;
         private StreamWriter writer;
         private StreamReader reader;
@@ -110,41 +110,11 @@ namespace RouterManagement.Logic.Connections
             return parseAnswerToDictionary(answer);
         }
 
-        public Dictionary<string, string> SendFake_UciShow()
-        {
-            using (var client = new WebClient())
-            {
-                var answer = client.DownloadString("http://wklej.org/id/3085238/txt/");
-
-                var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                var entriesAsDictionary = entriesTable
-                    .Select(part => part.Split('='))
-                    .ToDictionary(split => split[0], split => split[1]);
-
-                return entriesAsDictionary;
-            }
-        }
-
         public Dictionary<string, string> Send_UciShowWireless()
         {
             var answer = SendCommand("uci show wireless");
 
             return parseAnswerToDictionary(answer);
-        }
-
-        public Dictionary<string, string> SendFake_UciShowWireless()
-        {
-            using (WebClient client = new WebClient())
-            {
-                var answer = client.DownloadString("http://wklej.org/id/3085279/txt/");
-
-                var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                var entriesAsDictionary = entriesTable
-                    .Select(part => part.Split('='))
-                    .ToDictionary(split => split[0], split => split[1]);
-
-                return entriesAsDictionary;
-            }
         }
 
         public void Send_UciSetWireless(SendUciShowWirelessViewModel wireless)
@@ -171,21 +141,6 @@ namespace RouterManagement.Logic.Connections
         {
             var answer = SendCommand("uci show firewall");
             return parseAnswerToDictionary(answer);
-        }
-
-        public Dictionary<string, string> SendFake_UciShowFirewall()
-        {
-            using (WebClient client = new WebClient())
-            {
-                string answer = client.DownloadString("http://wklej.org/id/3085278/txt/");
-
-                var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                var entriesAsDictionary = entriesTable
-                    .Select(part => part.Split('='))
-                    .ToDictionary(split => split[0], split => split[1]);
-
-                return entriesAsDictionary;
-            }
         }
 
         public void Send_DeleteFirewallRule(int ruleId)
@@ -235,6 +190,55 @@ namespace RouterManagement.Logic.Connections
 
             return answer;
         }
+
+        #region fake methods
+
+        public Dictionary<string, string> SendFake_UciShow()
+        {
+            using (var client = new WebClient())
+            {
+                var answer = client.DownloadString("http://wklej.org/id/3085238/txt/");
+
+                var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var entriesAsDictionary = entriesTable
+                    .Select(part => part.Split('='))
+                    .ToDictionary(split => split[0], split => split[1]);
+
+                return entriesAsDictionary;
+            }
+        }
+
+        public Dictionary<string, string> SendFake_UciShowWireless()
+        {
+            using (WebClient client = new WebClient())
+            {
+                var answer = client.DownloadString("http://wklej.org/id/3085279/txt/");
+
+                var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var entriesAsDictionary = entriesTable
+                    .Select(part => part.Split('='))
+                    .ToDictionary(split => split[0], split => split[1]);
+
+                return entriesAsDictionary;
+            }
+        }
+
+        public Dictionary<string, string> SendFake_UciShowFirewall()
+        {
+            using (WebClient client = new WebClient())
+            {
+                string answer = client.DownloadString("http://wklej.org/id/3085278/txt/");
+
+                var entriesTable = answer.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var entriesAsDictionary = entriesTable
+                    .Select(part => part.Split('='))
+                    .ToDictionary(split => split[0], split => split[1]);
+
+                return entriesAsDictionary;
+            }
+        }
+
+        #endregion
 
         #region private methods
 

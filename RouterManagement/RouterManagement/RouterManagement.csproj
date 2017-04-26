@@ -232,6 +232,8 @@
     <Compile Include="Models\ViewModels\FirewallViewModel.cs" />
     <Compile Include="Models\ViewModels\ManageViewModels.cs" />
     <Compile Include="Models\RouterAccesData.cs" />
+    <Compile Include="Models\ViewModels\RouterActivityDataViewModel.cs" />
+    <Compile Include="Models\ViewModels\RouterOnListViewModel.cs" />
     <Compile Include="Models\ViewModels\SendUciShowWirelessViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -302,6 +304,7 @@
     <Content Include="Views\Admin\PartialViews\_AddRule.cshtml" />
     <Content Include="Views\Admin\PartialViews\_SelectRouter.cshtml" />
     <Content Include="Views\Admin\NoRoutersError.cshtml" />
+    <Content Include="Views\Admin\AllRouters.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

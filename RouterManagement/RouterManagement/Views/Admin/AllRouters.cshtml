@@ -1,89 +1,70 @@
-﻿@model List<RouterManagement.Models.ViewModels.FirewallViewModel>
+﻿@model List<RouterManagement.Models.ViewModels.RouterActivityDataViewModel>
 
 @Scripts.Render("~/bundles/ListJS")
 
 @{
-    ViewBag.Title = "Firewall";
-    var routerName = HttpContext.Current.Request["name"] ?? RouterManagement.Logic.Connections.Routers.GetFirstRouterName();
+    ViewBag.Title = "Routers";
 }
 
 <h2>Current firewall rules</h2>
 <hr>
-<div id="rules">
-    @Html.Partial("PartialViews/_SelectRouter")
-
+<div id="routers">
     <table class="table table-striped table-bordered">
         <thead class="thead-inverse">
             <tr>
-                <th class="sort" data-sort="Id">Id</th>
-                <th class="sort" data-sort="Type">Type</th>
-                <th class="sort" data-sort="Is_Ingreee">Is ingreee?</th>
-                <th class="sort" data-sort="Description">Description</th>
-                <th class="sort" data-sort="Local_addr">Addresses</th>
-                <th class="sort" data-sort="Active_hours">Active hours</th>
-                <th class="sort" data-sort="Enabled">Enabled?</th>
+                <th class="sort" data-sort="Name">Name</th>
+                <th class="sort" data-sort="IsActive">Is online?</th>
+                <th class="sort" data-sort="RouterIp">Ip adress</th>
+                <th class="sort" data-sort="Port">Port</th>
+                <th class="sort" data-sort="Login">Login</th>
+                <th class="sort" data-sort="Password">Password?</th>
                 <th colspan="2">
                     <input type="text" class="search" placeholder="Search entity" />
                 </th>
             </tr>
         </thead>
         <tbody class="list">
-            @foreach (var f in Model)
+            @foreach (var r in Model)
             {
                 <tr>
-                    <td class="id">@f.Id</td>
-                    <td class="type">@f.Type</td>
-                    <td class="isIngreee">@f.Is_Ingreee</td>
-                    <td class="description">@f.Description</td>
-                    @if (f.Local_addr != null)
-                {
-                        <td class="local_addr">@String.Join(Environment.NewLine, f.Local_addr)</td>
-                    }
-                    else
-                    {
-                        <td class="local_addr">@String.Empty</td>
-                    }
+                    <td class="name">@r.Name</td>
+                    <td class="isActive">@r.IsActive</td>
+                    <td class="routerIp">@r.RouterIp</td>
+                    <td class="port">@r.Port</td>
+                    <td class="login">@r.Login</td>
+                    <td class="password">@r.Password</td>
 
-                    @if (f.Active_hours != null)
-                {
-                        <td class="active_hours">@String.Join(Environment.NewLine, f.Active_hours)</td>
-                    }
-                    else
-                    {
-                        <td class="active_hours">@String.Empty</td>
-                    }
-                    <td class="enabled">@f.Enabled</td>
                     <td class="edit"><button class="edit-item btn btn-primary">Edit</button></td>
                     <td class="remove"><button class="remove-item btn btn-danger">Delete</button></td>
                 </tr>
             }
         </tbody>
     </table>
-    <button id="addRuleBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Add rule</button>
+    <button id="addRouterBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Add router</button>
 </div>
 
-<div id="addRuleModal" class="modal fade in" data-url='@Url.Action("AddRulePartial")'>
-    <div id="addRuleContainer"></div>
+<div id="addRouterModal" class="modal fade in" data-url='@Url.Action("AddRouterPartial")'>
+    <div id="addRouterContainer"></div>
 </div>
 
 <script>
     var options = {
-        valueNames: ['id', 'type', 'is_Ingreee', 'description', 'local_addr', 'active_hours', 'enabled']
+        valueNames: ['name', 'isActive', 'routerIp', 'port', 'login', 'password']
     };
 
-    var rulesList = new List('rules', options);
+    var routersList = new List('routers', options);
 
     $(document).ready(function () {
-        $(document).on('click', '#addRuleBtn', function () {
-            const url = $('#addRuleModal').data('url');
+        $(document).on('click', '#addRouterBtn', function () {
+            const url = $('#addRouterModal').data('url');
 
             $.ajax({
                 type: "POST",
                 url: url,
                 cache: false,
                 success: function (data) {
-                    $('#addRuleContainer').html(data);
-                    $('#addRuleModal').appendTo("body").modal('show');
+                    $('#addRouterContainer').html(data);
+                    $('#addRouterModal').appendTo("body").modal('show');
                 }
             });
         });
@@ -120,10 +101,9 @@
             var ruleId = $(this).closest('tr').find('.id').text();
             $.ajax({
                 type: "POST",
-                url: "/Admin/RemoveRule",
+                url: "/Admin/RemoveRouter",
                 data: {
-                    ruleId: ruleId,
-                    name: '@routerName'
+                    name: 'router aaa'
                 },
                 cache: false,
                 success: function (result) {
@@ -131,7 +111,7 @@
                         rulesList.remove("id", ruleId);
                     }
                     else {
-                        alert("There was a problem when deleting rule.");
+                        alert("There was a problem when deleting Router.");
                     }
                 }
             });

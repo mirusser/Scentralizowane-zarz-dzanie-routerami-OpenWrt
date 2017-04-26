@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RouterManagement.Logic.Repositories;
 using RouterManagement.Models;
 using RouterManagement.Models.Context;
+using RouterManagement.Models.ViewModels;
 
 namespace RouterManagement.Logic.Connections
 {
     public static class Routers
     {
-        private static Dictionary<string, SshConnection> onlineRoutersDict = new Dictionary<string, SshConnection>();
-        private static Dictionary<string, SshConnection> offlineRoutersDict = new Dictionary<string, SshConnection>();
+        private static List<RouterOnListViewModel> routerDataList = new List<RouterOnListViewModel>();
 
         public static void CreateNewConnection(RouterAccesData routerAccesData)
         {
@@ -25,20 +24,15 @@ namespace RouterManagement.Logic.Connections
             }
 
             var connection = new SshConnection(routerAccesData);
-            if (connection.IsConnected())
-            {
-                onlineRoutersDict.Add(routerAccesData.Name, connection);
-            }
-            else
-            {
-                offlineRoutersDict.Add(routerAccesData.Name, connection);
-            }
+
+            RouterOnListViewModel routerData = new RouterOnListViewModel();
+            routerData.IsActive = connection.IsConnected();
+            routerData.Name = routerAccesData.Name;
+            routerData.SshConnection = connection;
         }
 
         public static void Initialize()
         {
-            if (onlineRoutersDict.Count > 0) onlineRoutersDict = new Dictionary<string, SshConnection>();
-
             using (var uow = new DataContextUoW(new RouterManagementEntities()))
             {
                 if (uow.RouterAccesDatasRepository.Any())
@@ -47,24 +41,56 @@ namespace RouterManagement.Logic.Connections
                     {
                         var connection = new SshConnection(data);
 
-                        if (connection.IsConnected())
-                        {
-                            onlineRoutersDict.Add(data.Name, connection);
-                        }
-                        else
-                        {
-                            offlineRoutersDict.Add(data.Name, connection);
-                        }
+                        RouterOnListViewModel routerData = new RouterOnListViewModel();
+                        routerData.IsActive = connection.IsConnected();
+                        routerData.Name = data.Name;
+                        routerData.SshConnection = connection;
                     });
                 }
             }
         }
 
+        public static List<RouterActivityDataViewModel> GetRoutersAsRouterAccesDataViewModel()
+        {
+            var allRouters = new List<RouterActivityDataViewModel>();
+
+            using (var uow = new DataContextUoW(new RouterManagementEntities()))
+            {
+                var allRoutersFromDb = uow.RouterAccesDatasRepository.GetAll();
+                foreach (var r in allRoutersFromDb)
+                {
+                    allRouters.Add(new RouterActivityDataViewModel
+                    {
+                        Name = r.Name,
+                        IsActive = (routerDataList.FirstOrDefault(it =>it.Name == r.Name) == null) ? false : true,
+                        RouterIp = r.RouterIp,
+                        Port = r.Port,
+                        Login = r.Login,
+                        Password = r.Password
+                    });
+                }
+            }
+
+            return allRouters;
+        }
+
+        public static void UpdateRoutersInfo()
+        {
+            routerDataList.Clear();
+            Initialize();
+        }
+
         public static SshConnection GetConnectionByName(string name)
         {
-            SshConnection connection = null;
-            onlineRoutersDict.TryGetValue(name, out connection);
-            return connection;
+            var searchedRouter = routerDataList.FirstOrDefault(it => it.Name == name);
+            if(searchedRouter != null)
+            {
+                return searchedRouter.SshConnection;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static void DeleteConnectionByName(string name)
@@ -80,17 +106,27 @@ namespace RouterManagement.Logic.Connections
                 uow.Save();
             }
 
-            onlineRoutersDict.Remove(name);
+            var routerToRemove = routerDataList.FirstOrDefault(it => it.Name == name);
+            routerDataList.Remove(routerToRemove);
         }
 
         public static ICollection<string> GetRoutersNames()
         {
-            return onlineRoutersDict.Keys.OrderBy(x => x).ToList();
+            return routerDataList.Select(it => it.Name).OrderBy(x => x).ToList();
         }
 
         public static string GetFirstRouterName()
         {
-            return onlineRoutersDict.FirstOrDefault().Key;
+            var searchedRouter = routerDataList.FirstOrDefault(it => it.IsActive == true);
+
+            if(searchedRouter == null)
+            {
+                return null;
+            }
+            else
+            {
+                return searchedRouter.Name;
+            }
         }
     }
 }

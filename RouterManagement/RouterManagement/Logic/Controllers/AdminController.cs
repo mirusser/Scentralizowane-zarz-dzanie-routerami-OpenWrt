@@ -33,16 +33,23 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult AllRouters()
         {
+            var allRouters = Routers.GetRoutersAsRouterAccesDataViewModel();
+
+            return View(allRouters);
+        }
+
+        public ActionResult AddRouterPartial()
+        {
+
+
             return null;
         }
 
-        public ActionResult AddRouter()
+        [HttpPost]
+        public ActionResult DeleteRouter(string name)
         {
-            return null;
-        }
+            Routers.DeleteConnectionByName(name);
 
-        public ActionResult DeleteRouter()
-        {
             return null;
         }
 
