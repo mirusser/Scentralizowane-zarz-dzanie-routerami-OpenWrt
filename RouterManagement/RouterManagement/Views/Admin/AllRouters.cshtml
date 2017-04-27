@@ -11,33 +11,40 @@
 <div id="routers">
     <table class="table table-striped table-bordered">
         <thead class="thead-inverse">
-        <tr>
-            <th class="sort" data-sort="Name">Name</th>
-            <th class="sort" data-sort="RouterIp">Ip adress</th>
-            <th class="sort" data-sort="Port">Port</th>
-            <th class="sort" data-sort="Login">Login</th>
-            <th class="sort" data-sort="Password">Password?</th>
-            <th class="sort" data-sort="IsActive">Is online?</th>
-            <th colspan="2">
-                <input type="text" class="search" placeholder="Search entity"/>
-            </th>
-        </tr>
+            <tr>
+                <th class="sort" data-sort="Name">Name</th>
+                <th class="sort" data-sort="RouterIp">Ip adress</th>
+                <th class="sort" data-sort="Port">Port</th>
+                <th class="sort" data-sort="Login">Login</th>
+                <th class="sort" data-sort="Password">Password?</th>
+                <th class="sort" data-sort="IsActive">Is online?</th>
+                <th colspan="2">
+                    <input type="text" class="search" placeholder="Search entity" />
+                </th>
+            </tr>
         </thead>
         <tbody class="list">
-        @foreach (var r in Model)
-        {
-            <tr>
-                <td class="name">@r.Name</td>
-                <td class="routerIp">@r.RouterIp</td>
-                <td class="port">@r.Port</td>
-                <td class="login">@r.Login</td>
-                <td class="password">***</td>
-                <td class="isActive">@r.IsActive</td>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td class="name">@r.Name</td>
+                    <td class="routerIp">@r.RouterIp</td>
+                    <td class="port">@r.Port</td>
+                    <td class="login">@r.Login</td>
+                    <td class="password">***</td>
+                    <td class="isActive">
+                        @if (r.IsActive){
+                            <span class="glyphicon glyphicon-ok" style="color:green;"></span>
+                        }
+                        else{
+                            <span class="glyphicon glyphicon-remove" style="color:red;"></span>
+                        }
+                    </td>
 
-                <td><button class="btn btn-primary edit-item">Edit</button></td>
-                <td><button class="btn btn-danger remove-item">Delete</button></td>
-            </tr>
-        }
+                    <td><button class="btn btn-primary edit-item">Edit</button></td>
+                    <td><button class="btn btn-danger remove-item">Delete</button></td>
+                </tr>
+            }
         </tbody>
     </table>
     <button id="addRouterBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Add router</button>
@@ -78,15 +85,15 @@
 
             const url = $('#modifyRouterModal').data('url');
 
-                $.ajax({
-                    type: "POST",
-                    url: url,
-                    data: { router: routerName },
-                    cache: false,
-                    success: function (data) {
-                        $('#modifyRouterContainer').html(data);
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { router: routerName },
+                cache: false,
+                success: function (data) {
+                    $('#modifyRouterContainer').html(data);
 
-                        $('#modifyRouterModal').appendTo("body").modal('show');
+                    $('#modifyRouterModal').appendTo("body").modal('show');
                 }
             });
         });

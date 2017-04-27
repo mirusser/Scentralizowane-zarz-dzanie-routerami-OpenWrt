@@ -67,7 +67,7 @@
             }
 
             if (!validateIpOrDomain(objectToSend.RouterIp)) {
-                alert("You have typed adresses in not proper format");
+                alert("You have typed router adresses in not proper format");
                 return;
             }
 
@@ -88,11 +88,20 @@
                 cache: false,
                 success: function (result) {
                     if (result.status == "true") {
+
+                        var online = '';
+                        if (result.isConnected == "true") {
+                            online = '<span class="glyphicon glyphicon-ok" style="color:green;"></span>';
+                        }
+                        else {
+                            online = '<span class="glyphicon glyphicon-remove" style="color:red;"></span>';
+                        }
+
                         routersList.remove('name', '@Model.Name');
 
                         routersList.add({
                             name: $('#name-modifyField').val(),
-                            isActive: result.isConnected,
+                            isActive: online,
                             routerIp: $('#routerIp-modifyField').val(),
                             port: $('#port-modifyField').val(),
                             login: $('#login-modifyField').val(),
@@ -111,7 +120,7 @@
         });
 
         function validateIpOrDomain(inputText) {
-            const format = /^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$/;
+            const format = /^((((([a-zA-Z]+|[a-zA-Z0-9]*)\.)+)(([a-zA-Z]+[a-zA-Z0-9]*)+))|((\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5])))|(localhost))$/;
             if (inputText.match(format) != null) {
                 return true;
             }
