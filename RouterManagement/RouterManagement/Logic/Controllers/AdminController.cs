@@ -45,7 +45,7 @@ namespace RouterManagement.Logic.Controllers
             return PartialView("~/Views/Admin/PartialViews/_AddRouter.cshtml", allRoutersNames);
         }
 
-        public ActionResult SaveRouter(AddRouterViewModel router)
+        public ActionResult SaveRouter(RouterPartialDataViewModel router)
         {
             if (!ModelState.IsValid) return Json(new { status = "false" }, JsonRequestBehavior.AllowGet);
 

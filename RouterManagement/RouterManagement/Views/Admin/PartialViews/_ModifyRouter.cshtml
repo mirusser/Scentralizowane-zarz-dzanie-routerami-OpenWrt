@@ -1,0 +1,109 @@
+﻿@model Entities.Models.Consultation
+
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Edytuj publikację</h4>
+    </div>
+    <div class="modal-body">
+        <table class="table table-bordered">
+            <tr>
+                <td class="col-md-3">
+                    <input type="text" class="form-control" id="place-modifyField" placeholder="Miejsce konsultacji" value="@Model.Place" />
+                </td>
+                <td class="col-md-2">
+                    <select select class="form-control" data-placeholder="Dzień tygodnia" id="dayOfTheWeek-modifyField">
+                        <option value="0" id="Poniedziałek">Poniedziałek</option>
+                        <option value="1" id="Wtorek">Wtorek</option>
+                        <option value="2" id="Środa">Środa</option>
+                        <option value="3" id="Czwartek">Czwartek</option>
+                        <option value="4" id="Piątek">Piątek</option>
+                        <option value="5" id="Sobota">Sobota</option>
+                        <option value="6" id="Niedziela">Niedziela</option>
+                    </select>
+                </td>
+                <td class="col-md-2">
+                    <input type="text" class="form-control" id="startTime-modifyField" placeholder="Godzina rozpoczęcia" value="@Model.StartTime" />
+                </td>
+                <td class="col-md-2">
+                    <input type="text" class="form-control" id="endTime-modifyField" placeholder="Godzina zakończenia" value="@Model.EndTime" />
+                </td>
+                <td class="col-md-1">
+                    <button id="modifyPublication-btn" class="btn btn-success">Edytuj</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#dayOfTheWeek-modifyField").val("@Convert.ToInt32(Model.DayOfTheWeek)");
+
+        $("#modifyPublication-btn").click(function () {
+            var objectToSend = {
+                __RequestVerificationToken: $('@Html.AntiForgeryToken()').val(),
+                Id: @Model.Id,
+                Place: $('#place-modifyField').val(),
+                DayOfTheWeek: $('#dayOfTheWeek-modifyField').val(),
+                StartTime: $('#startTime-modifyField').val(),
+                EndTime: $('#endTime-modifyField').val()
+            }
+
+            if (objectToSend.Place.length === 0) {
+                alert("Musisz podać miejsce, w którym konsultacja się odbywa");
+                return;
+            }
+
+            if (objectToSend.DayOfTheWeek.length === 0) {
+                alert("Wybierz dzień tygodnia, w którym konsultacja się odbywa");
+                return;
+            }
+
+            if (objectToSend.StartTime.length === 0) {
+                alert("Podaj godzinę rozpoczącia konsultacji");
+                return;
+            }
+
+            if (!validateHour(objectToSend.StartTime)) {
+                alert("Niepoprawny format godziny rozpoczęcia konsultacji");
+                return;
+            }
+
+            if (objectToSend.EndTime.length === 0) {
+                alert("Podaj godzinę zakończenia konsultacji");
+                return;
+            }
+
+            if (!validateHour(objectToSend.EndTime)) {
+                alert("Niepoprawny format godziny zakończenia konsultacji");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/Teacher/ModifyConsultation",
+                data: objectToSend,
+                cache: false,
+                success: function (result) {
+                    consultationList.remove("id", objectToSend.Id);
+
+                    consultationList.add({
+                        id: objectToSend.Id,
+                        place: objectToSend.Place,
+                        dayOfTheWeek: result.DayOfTheWeek,
+                        startTime: objectToSend.StartTime,
+                        endTime: objectToSend.EndTime
+                    });
+
+                    $("#modifyConsultationContainer").html("");
+
+                    $('#modifyConsultationModal').modal('hide');
+                }
+            });
+        });
+    });
+</script>
