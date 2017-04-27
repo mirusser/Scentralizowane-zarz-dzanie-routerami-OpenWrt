@@ -1,7 +1,4 @@
-﻿@model IEnumerable<string>
-@{
-    var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-}
+﻿@model RouterManagement.Models.ViewModels.AddRouterDataPartialViewModel
 
 <div class="modal-content">
     <div class="modal-header">
@@ -14,19 +11,19 @@
             <tr>
                 <td>
                     <p>Friendly name</p>
-                    <input type="text" class="form-control" id="name-addField" placeholder="router in salon" />
+                    <input type="text" class="form-control" id="name-addField" placeholder="eg. router in salon" />
                 </td>
                 <td>
                     <p>Ip/host adress</p>
-                    <input type="text" class="form-control" id="routerIp-addField" placeholder="192.168.1.1" />
+                    <input type="text" class="form-control" id="routerIp-addField" placeholder="eg. 192.168.1.1" />
                 </td>
                 <td>
                     <p>Port</p>
-                    <input type="text" class="form-control" id="port-addField" placeholder="22" />
+                    <input type="text" class="form-control" id="port-addField" placeholder="eg. 22" />
                 </td>
                 <td>
                     <p>Login</p>
-                    <input type="text" class="form-control" id="login-addField" value="root" placeholder="root" />
+                    <input type="text" class="form-control" id="login-addField" value="root" placeholder="eg. root" />
                 </td>
                 <td>
                     <p>Password</p>
@@ -60,7 +57,7 @@
             }
 
             const usedNames = [];
-            @foreach (var name in Model)
+            @foreach (var name in Model.AllRoutersNames)
             {
                 @:usedNames.push("@name");
             }
@@ -86,7 +83,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "/Admin/SaveRouter",
+                url: "/Admin/AddRouter",
                 data:
                 {
                     router: objectToSend
@@ -95,12 +92,12 @@
                 success: function (result) {
                     if (result.status == "true") {
                         routersList.add({
-                            name: $('#name-addField').val(),
+                            name: objectToSend.Name,
                             isActive: result.isConnected,
-                            routerIp: $('#routerIp-addField').val(),
-                            port: $('#port-addField').val(),
-                            login: $('#login-addField').val(),
-                            password: $('#password-addField').val(),
+                            routerIp: objectToSend.RouterIp,
+                            port: objectToSend.Port,
+                            login: objectToSend.Login,
+                            password: '***'
                         });
                     }
                     else {
@@ -132,6 +129,16 @@
             else {
                 return false;
             }
+        }
+
+        function contains(a, obj) {
+            var i = a.length;
+            while (i--) {
+                if (a[i] == obj) {
+                    return true;
+                }
+            }
+            return false;
         }
     });
 </script>

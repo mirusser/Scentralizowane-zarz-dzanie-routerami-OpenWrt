@@ -1,109 +1,143 @@
-﻿@model Entities.Models.Consultation
+﻿@model RouterManagement.Models.ViewModels.ModifyRouterDataPartialViewModel
 
 <div class="modal-content">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Edytuj publikację</h4>
+        <h4 class="modal-title">Edit router</h4>
     </div>
     <div class="modal-body">
         <table class="table table-bordered">
             <tr>
-                <td class="col-md-3">
-                    <input type="text" class="form-control" id="place-modifyField" placeholder="Miejsce konsultacji" value="@Model.Place" />
+                <td>
+                    <p>Friendly name</p>
+                    <input type="text" class="form-control" id="name-modifyField" value="@Model.Name" placeholder="eg. router in salon" />
                 </td>
-                <td class="col-md-2">
-                    <select select class="form-control" data-placeholder="Dzień tygodnia" id="dayOfTheWeek-modifyField">
-                        <option value="0" id="Poniedziałek">Poniedziałek</option>
-                        <option value="1" id="Wtorek">Wtorek</option>
-                        <option value="2" id="Środa">Środa</option>
-                        <option value="3" id="Czwartek">Czwartek</option>
-                        <option value="4" id="Piątek">Piątek</option>
-                        <option value="5" id="Sobota">Sobota</option>
-                        <option value="6" id="Niedziela">Niedziela</option>
-                    </select>
+                <td>
+                    <p>Ip/host adress</p>
+                    <input type="text" class="form-control" id="routerIp-modifyField" value="@Model.RouterIp" placeholder="eg. 192.168.1.1" />
                 </td>
-                <td class="col-md-2">
-                    <input type="text" class="form-control" id="startTime-modifyField" placeholder="Godzina rozpoczęcia" value="@Model.StartTime" />
+                <td>
+                    <p>Port</p>
+                    <input type="text" class="form-control" id="port-modifyField" value="@Model.Port" placeholder="eg. 22" />
                 </td>
-                <td class="col-md-2">
-                    <input type="text" class="form-control" id="endTime-modifyField" placeholder="Godzina zakończenia" value="@Model.EndTime" />
+                <td>
+                    <p>Login</p>
+                    <input type="text" class="form-control" id="login-modifyField" value="@Model.Login" placeholder="eg. root" />
                 </td>
-                <td class="col-md-1">
-                    <button id="modifyPublication-btn" class="btn btn-success">Edytuj</button>
+                <td>
+                    <p>Password</p>
+                    <input type="password" class="form-control" value="@Model.Password" id="password-modifyField" />
+                </td>
+                <td>
+                    <button id="modifyRouter-btn" class="btn btn-success">Modify</button>
                 </td>
             </tr>
         </table>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     </div>
 </div>
 
 <script>
     $(document).ready(function () {
-        $("#dayOfTheWeek-modifyField").val("@Convert.ToInt32(Model.DayOfTheWeek)");
+        $("#modifyRouter-btn").click(function () {
+            const objectToSend = {
+                Name: $('#name-modifyField').val(),
+                OldName: '@Model.Name',
+                RouterIp: $('#routerIp-modifyField').val(),
+                Port: $('#port-modifyField').val(),
+                Login: $('#login-modifyField').val(),
+                Password: $('#password-modifyField').val(),
+            };
 
-        $("#modifyPublication-btn").click(function () {
-            var objectToSend = {
-                __RequestVerificationToken: $('@Html.AntiForgeryToken()').val(),
-                Id: @Model.Id,
-                Place: $('#place-modifyField').val(),
-                DayOfTheWeek: $('#dayOfTheWeek-modifyField').val(),
-                StartTime: $('#startTime-modifyField').val(),
-                EndTime: $('#endTime-modifyField').val()
-            }
-
-            if (objectToSend.Place.length === 0) {
-                alert("Musisz podać miejsce, w którym konsultacja się odbywa");
+            if (objectToSend.Name.length === 0) {
+                alert("You have to type router name");
                 return;
             }
 
-            if (objectToSend.DayOfTheWeek.length === 0) {
-                alert("Wybierz dzień tygodnia, w którym konsultacja się odbywa");
+            const usedNames = [];
+            @foreach (var name in Model.AllRoutersNames)
+            {
+                @:usedNames.push("@name");
+            }
+            if (contains(usedNames, objectToSend.Name)) {
+                alert("This name is in use");
                 return;
             }
 
-            if (objectToSend.StartTime.length === 0) {
-                alert("Podaj godzinę rozpoczącia konsultacji");
+            if (!validateIpOrDomain(objectToSend.RouterIp)) {
+                alert("You have typed adresses in not proper format");
                 return;
             }
 
-            if (!validateHour(objectToSend.StartTime)) {
-                alert("Niepoprawny format godziny rozpoczęcia konsultacji");
+            if (!validateNumberOrEmpty(objectToSend.Port)) {
+                alert("You have typed adresses in not proper format");
                 return;
             }
 
-            if (objectToSend.EndTime.length === 0) {
-                alert("Podaj godzinę zakończenia konsultacji");
-                return;
-            }
-
-            if (!validateHour(objectToSend.EndTime)) {
-                alert("Niepoprawny format godziny zakończenia konsultacji");
+            if (objectToSend.Login.length === 0) {
+                alert("You have to name description");
                 return;
             }
 
             $.ajax({
                 type: "POST",
-                url: "/Teacher/ModifyConsultation",
+                url: "/Admin/ModifyRouter",
                 data: objectToSend,
                 cache: false,
                 success: function (result) {
-                    consultationList.remove("id", objectToSend.Id);
+                    if (result.status == "true") {
+                        routersList.remove('name', '@Model.Name');
 
-                    consultationList.add({
-                        id: objectToSend.Id,
-                        place: objectToSend.Place,
-                        dayOfTheWeek: result.DayOfTheWeek,
-                        startTime: objectToSend.StartTime,
-                        endTime: objectToSend.EndTime
-                    });
+                        routersList.add({
+                            name: $('#name-modifyField').val(),
+                            isActive: result.isConnected,
+                            routerIp: $('#routerIp-modifyField').val(),
+                            port: $('#port-modifyField').val(),
+                            login: $('#login-modifyField').val(),
+                            password: '***'
+                        });
+                    }
+                    else {
+                        alert("Error when modyfying router occured");
+                    }
 
-                    $("#modifyConsultationContainer").html("");
+                    $("#modifyRouterContainer").html("");
 
-                    $('#modifyConsultationModal').modal('hide');
+                    $('#modifyRouterModal').modal('hide');
                 }
             });
         });
+
+        function validateIpOrDomain(inputText) {
+            const format = /^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$/;
+            if (inputText.match(format) != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        function validateNumberOrEmpty(inputText) {
+            const format = /^(\s*|\d+)$/;
+            if (inputText.match(format) != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        function contains(a, obj) {
+            var i = a.length;
+            while (i--) {
+                if (a[i] == obj) {
+                    return true;
+                }
+            }
+            return false;
+        }
     });
 </script>

@@ -14,8 +14,7 @@ namespace RouterManagement.Logic.Controllers
     {
         public ActionResult Index()
         {
-            var names = Routers.GetOnlineRoutersNames();
-            return View(names);
+            return View();
         }
 
         public ActionResult SendUciShow(string name = null)
@@ -41,11 +40,12 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult AddRouterPartial()
         {
-            var allRoutersNames = Routers.GetAllRoutersNames();
+            AddRouterDataPartialViewModel allRoutersNames = new AddRouterDataPartialViewModel {AllRoutersNames = Routers.GetAllRoutersNames()};
             return PartialView("~/Views/Admin/PartialViews/_AddRouter.cshtml", allRoutersNames);
         }
 
-        public ActionResult SaveRouter(RouterPartialDataViewModel router)
+        [HttpPost]
+        public ActionResult AddRouter(AddRouterDataViewModel router)
         {
             if (!ModelState.IsValid) return Json(new { status = "false" }, JsonRequestBehavior.AllowGet);
 
@@ -58,6 +58,42 @@ namespace RouterManagement.Logic.Controllers
                 Password = router.Password
             };
 
+            Routers.CreateNewConnection(routerAccesData);
+
+            var isConnected = Routers.CheckIfRouterIsConnected(router.Name);
+
+            return Json(new { status = "true", isConnected = isConnected.ToString() }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ModifyRouterPartial(string router)
+        {
+            var routerToModify = Routers.GetRouterAccesDataByName(router);
+            var routerToModifyModel = new ModifyRouterDataPartialViewModel
+            {
+                Name = routerToModify.Name,
+                RouterIp = routerToModify.RouterIp,
+                Port = routerToModify.Port,
+                Login = routerToModify.Login,
+                Password = routerToModify.Password,
+                AllRoutersNames = Routers.GetAllRoutersNames().Except(new List<string>{router})
+            };
+            return PartialView("~/Views/Admin/PartialViews/_ModifyRouter.cshtml", routerToModifyModel);
+        }
+
+        [HttpPost]
+        public ActionResult ModifyRouter(ModifyRouterDataViewModel router)
+        {
+            if (!ModelState.IsValid) return Json(new { status = "false" }, JsonRequestBehavior.AllowGet);
+
+            var routerAccesData = new RouterAccesData
+            {
+                Name = router.Name,
+                RouterIp = router.RouterIp,
+                Port = router.Port,
+                Login = router.Login,
+                Password = router.Password
+            };
+            Routers.DeleteConnectionByName(router.OldName);
             Routers.CreateNewConnection(routerAccesData);
 
             var isConnected = Routers.CheckIfRouterIsConnected(router.Name);

@@ -24,23 +24,27 @@
         </tr>
         </thead>
         <tbody class="list">
-            @foreach (var r in Model)
-            {
-                <tr>
-                    <td class="name">@r.Name</td>
-                    <td class="routerIp">@r.RouterIp</td>
-                    <td class="port">@r.Port</td>
-                    <td class="login">@r.Login</td>
-                    <td class="password">@r.Password</td>
-                    <td class="isActive">@r.IsActive</td>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td class="name">@r.Name</td>
+                <td class="routerIp">@r.RouterIp</td>
+                <td class="port">@r.Port</td>
+                <td class="login">@r.Login</td>
+                <td class="password">***</td>
+                <td class="isActive">@r.IsActive</td>
 
-                    <td><button class="btn btn-primary edit-item">Edit</button></td>
-                    <td><button class="btn btn-danger remove-item">Delete</button></td>
-                </tr>
-            }
+                <td><button class="btn btn-primary edit-item">Edit</button></td>
+                <td><button class="btn btn-danger remove-item">Delete</button></td>
+            </tr>
+        }
         </tbody>
     </table>
     <button id="addRouterBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Add router</button>
+</div>
+
+<div id="modifyRouterModal" class="modal fade in" data-url='@Url.Action("ModifyRouterPartial")'>
+    <div id="modifyRouterContainer"></div>
 </div>
 
 <div id="addRouterModal" class="modal fade in" data-url='@Url.Action("AddRouterPartial")'>
@@ -69,33 +73,23 @@
             });
         });
 
-        //$(document).on('click', '.edit-item', function () {
-        //    const publicationId = $(this).closest('tr').find('.id').text();
-        //    const item = publicationList.get('id', publicationId)[0];
+        $(document).on('click', '.edit-item', function () {
+            const routerName = $(this).closest('tr').find('.name').text();
 
-        //    const objectToSend = {
-        //        Id: item._values.id,
-        //        TeacherAuthorsId: item._values.teacherAuthorsId,
-        //        AnotherAuthors: item._values.anotherAuthors,
-        //        Title: item._values.anotherAuthors,
-        //        PublishedIn: item._values.publishedIn,
-        //        AdditionalInfo: item._values.additionalInfo
-        //    };
+            const url = $('#modifyRouterModal').data('url');
 
-        //    const url = $('#modifyPublicationModal').data('url');
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: { router: routerName },
+                    cache: false,
+                    success: function (data) {
+                        $('#modifyRouterContainer').html(data);
 
-        //    $.ajax({
-        //        type: "POST",
-        //        url: url,
-        //        data: objectToSend,
-        //        cache: false,
-        //        success: function (data) {
-        //            $('#modifyPublicationContainer').html(data);
-
-        //            $('#modifyPublicationModal').appendTo("body").modal('show');
-        //        }
-        //    });
-        //});
+                        $('#modifyRouterModal').appendTo("body").modal('show');
+                }
+            });
+        });
 
         $(document).on('click', '.remove-item', function () {
             const name = $(this).closest('tr').find('.name').text();
@@ -117,14 +111,4 @@
             });
         });
     });
-
-    function contains(a, obj) {
-        var i = a.length;
-        while (i--) {
-            if (a[i] == obj) {
-                return true;
-            }
-        }
-        return false;
-    }
 </script>

@@ -75,7 +75,6 @@ namespace RouterManagement.Logic.Connections
                         RouterIp = r.RouterIp,
                         Port = r.Port,
                         Login = r.Login,
-                        Password = r.Password
                     });
                 });
             }
@@ -93,6 +92,14 @@ namespace RouterManagement.Logic.Connections
         {
             var searchedRouter = RouterDataList.FirstOrDefault(it => it.Name == name);
             return searchedRouter?.SshConnection;
+        }
+
+        public static RouterAccesData GetRouterAccesDataByName(string name)
+        {
+            using (var uow = new DataContextUoW(new RouterManagementEntities()))
+            {
+                return uow.RouterAccesDatasRepository.FirstOrDefault(it => it.Name == name);
+            }
         }
 
         public static void DeleteConnectionByName(string name)
