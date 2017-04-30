@@ -22,11 +22,17 @@
                         }));
                 });
 
-                $('#routersSelect').val("@RouterManagement.Logic.Connections.Routers.GetFirstRouterName()");
+                @if (!string.IsNullOrEmpty(Request.QueryString["name"])){
+                    @: $('#routersSelect').val("@Request.QueryString["name"]");
+                }
+                else{
+                    @: $('#routersSelect').val("@RouterManagement.Logic.Connections.Routers.GetFirstRouterName()");
+                }
             }
         });
 
         $("#changeRouterButton").click(function () {
+            $('#modalSpin').modal('show');
             window.location.replace(`@HttpContext.Current.Request.Url.AbsolutePath?name=${$('#routersSelect').val()}`);
         });
     });

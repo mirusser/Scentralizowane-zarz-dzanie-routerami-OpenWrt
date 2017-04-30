@@ -85,7 +85,7 @@
                 cache: false,
                 success: function (data) {
                     $('#addRouterContainer').html(data);
-                    $('#addRouterModal').appendTo("body").modal('show');
+                    $('#addRouterModal').appendTo("#bodyContent").modal('show');
                 }
             });
         });
@@ -102,7 +102,7 @@
                 cache: false,
                 success: function (data) {
                     $('#modifyRouterContainer').html(data);
-                    $('#modifyRouterModal').appendTo("body").modal('show');
+                    $('#modifyRouterModal').appendTo("#bodyContent").modal('show');
                 }
             });
         });
