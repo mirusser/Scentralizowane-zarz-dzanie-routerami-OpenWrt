@@ -19,7 +19,7 @@
                 <th class="sort" data-sort="Password">Password?</th>
                 <th class="sort" data-sort="IsActive">Is online?</th>
                 <th colspan="2">
-                    <input type="text" class="search" placeholder="Search entity" />
+                    <input type="text" class="search form-control input-sm" placeholder="Search entity" />
                 </th>
             </tr>
         </thead>
@@ -29,7 +29,14 @@
                 <tr>
                     <td class="name">@r.Name</td>
                     <td class="routerIp">@r.RouterIp</td>
-                    <td class="port">@r.Port</td>
+                    <td class="port">
+                        @if (r.Port == null){
+                            @:22
+                        }
+                        else{
+                            @r.Login
+                        }
+                    </td>
                     <td class="login">@r.Login</td>
                     <td class="password">***</td>
                     <td class="isActive">
@@ -41,8 +48,8 @@
                         }
                     </td>
 
-                    <td><button class="btn btn-primary edit-item">Edit</button></td>
-                    <td><button class="btn btn-danger remove-item">Delete</button></td>
+                    <td><button class="btn btn-primary edit-item col-md-12 col-xs-12">Edit</button></td>
+                    <td><button class="btn btn-danger remove-item col-md-12 col-xs-12">Delete</button></td>
                 </tr>
             }
         </tbody>
@@ -66,7 +73,10 @@
     var routersList = new List('routers', options);
 
     $(document).ready(function () {
+        $('#modalSpin').modal('hide');
+
         $(document).on('click', '#addRouterBtn', function () {
+            $('#modalSpin').modal('show');
             const url = $('#addRouterModal').data('url');
 
             $.ajax({
@@ -81,8 +91,8 @@
         });
 
         $(document).on('click', '.edit-item', function () {
+            $('#modalSpin').modal('show');
             const routerName = $(this).closest('tr').find('.name').text();
-
             const url = $('#modifyRouterModal').data('url');
 
             $.ajax({
@@ -92,13 +102,13 @@
                 cache: false,
                 success: function (data) {
                     $('#modifyRouterContainer').html(data);
-
                     $('#modifyRouterModal').appendTo("body").modal('show');
                 }
             });
         });
 
         $(document).on('click', '.remove-item', function () {
+            $('#modalSpin').modal('show');
             const name = $(this).closest('tr').find('.name').text();
             $.ajax({
                 type: "POST",
@@ -112,8 +122,10 @@
                         routersList.remove('name', name);
                     }
                     else {
-                        alert("There was a problem when deleting router.");
+                        $.notify("There was a problem when deleting router.");
                     }
+
+                    $('#modalSpin').modal('hide');
                 }
             });
         });

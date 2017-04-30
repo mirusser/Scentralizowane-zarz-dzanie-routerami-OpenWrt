@@ -8,9 +8,11 @@
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/Notify")
     @RenderSection("scripts", required: false)
 </head>
 <body>
+    @Html.Partial("_Notify")
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -32,9 +34,10 @@
     <div class="container body-content">
         @RenderBody()
         <hr />
-        <footer  class="text-center">
+        <footer class="text-center">
             <p>&copy; @DateTime.Now.Year - Router management by Paweł Maciejewski</p>
         </footer>
     </div>
+    @Html.Partial("_Spin")
 </body>
 </html>

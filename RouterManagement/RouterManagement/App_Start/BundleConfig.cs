@@ -28,8 +28,19 @@ namespace RouterManagement
             #endregion
 
             #region Additional plugins and styles
+
             bundles.Add(new ScriptBundle("~/bundles/ListJS").Include(
                         "~/Scripts/list.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/Spin").Include(
+                "~/Scripts/jquery.spin.js"));
+
+            bundles.Add(new StyleBundle("~/Content/Spin").Include(
+                "~/Content/jquery.spin.css"));
+
+            bundles.Add(new ScriptBundle("~/bundles/Notify").Include(
+                "~/Scripts/bootstrap-notify.js"));
+
             #endregion
 
             #region Pages Styles

@@ -1,0 +1,19 @@
+﻿@Styles.Render("~/Content/Spin")
+@Scripts.Render("~/bundles/Spin")
+
+<div class="modal fade" id="modalSpin">
+    <div class="modal-dialog" style="text-align:center;">
+        <div class="spin modal-body" style="margin:auto;top:45px;" data-spin></div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#modalSpin').modal({
+            show: false,
+            backdrop: 'static',
+            keyboard: true
+        });
+
+        $('.spin').spin();
+    });
+</script>

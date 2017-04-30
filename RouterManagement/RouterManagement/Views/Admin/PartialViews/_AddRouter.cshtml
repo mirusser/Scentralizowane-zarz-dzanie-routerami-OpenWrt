@@ -10,23 +10,23 @@
         <table class="table table-bordered">
             <tr>
                 <td>
-                    <p>Friendly name</p>
+                    <label for="name-addField">Friendly name</label>
                     <input type="text" class="form-control" id="name-addField" placeholder="eg. router in salon" />
                 </td>
                 <td>
-                    <p>Ip/host adress</p>
+                    <label for="routerIp-addField">Ip/host adress</label>
                     <input type="text" class="form-control" id="routerIp-addField" placeholder="eg. 192.168.1.1" />
                 </td>
                 <td>
-                    <p>Port</p>
-                    <input type="text" class="form-control" id="port-addField" placeholder="eg. 22" />
+                    <label for="port-addField">Port</label>
+                    <input type="text" class="form-control" id="port-addField" placeholder="Leave empty to set 22" />
                 </td>
                 <td>
-                    <p>Login</p>
+                    <label for="login-addField">Login</label>
                     <input type="text" class="form-control" id="login-addField" value="root" placeholder="eg. root" />
                 </td>
                 <td>
-                    <p>Password</p>
+                    <label for="password-addField">Password</label>
                     <input type="password" class="form-control" id="password-addField" />
                 </td>
                 <td>
@@ -42,7 +42,11 @@
 
 <script>
     $(document).ready(function () {
+        $('#modalSpin').modal('hide');
+
         $("#addRouter-btn").click(function () {
+            $('#modalSpin').modal('show');
+
             const objectToSend = {
                 Name: $('#name-addField').val(),
                 RouterIp: $('#routerIp-addField').val(),
@@ -51,9 +55,11 @@
                 Password: $('#password-addField').val(),
             };
 
+            var valid = true;
+
             if (objectToSend.Name.length === 0) {
-                alert("You have to type router name");
-                return;
+                $.notify("You have to type router name");
+                valid = false;
             }
 
             const usedNames = [];
@@ -61,23 +67,24 @@
             {
                 @:usedNames.push("@name");
             }
-            if (contains(usedNames, objectToSend.Name)) {
-                alert("This name is in use");
-                return;
+            if (contains(usedNames, objectToSend.Name) && objectToSend.Name.length !== 0) {
+                $.notify("This name is in use");
             }
 
             if (!validateIpOrDomain(objectToSend.RouterIp)) {
-                alert("You have typed router adresses in not proper format");
-                return;
+                $.notify("You have typed router adress in not proper format");
             }
 
             if (!validateNumberOrEmpty(objectToSend.Port)) {
-                alert("You have typed adresses in not proper format");
-                return;
+                $.notify("You have typed adresses in not proper format");
             }
 
             if (objectToSend.Login.length === 0) {
-                alert("You have to name description");
+                $.notify("You have to type login");
+            }
+
+            if (valid === false) {
+                $('#modalSpin').modal('hide');
                 return;
             }
 
@@ -91,8 +98,8 @@
                 cache: false,
                 success: function (result) {
                     if (result.status == "true") {
+                        let online = '';
 
-                        var online = '';
                         if (result.isConnected == "true")
                         {
                             online = '<span class="glyphicon glyphicon-ok" style="color:green;"></span>';
@@ -102,11 +109,19 @@
                             online = '<span class="glyphicon glyphicon-remove" style="color:red;"></span>';
                         }
 
+                        let port = '';
+                        if (!objectToSend.Port || 0 === objectToSend.Port.length) {
+                            port = '22';
+                        }
+                        else {
+                            port = objectToSend.Port;
+                        }
+
                         routersList.add({
                             name: objectToSend.Name,
                             isActive: online,
                             routerIp: objectToSend.RouterIp,
-                            port: objectToSend.Port,
+                            port: port,
                             login: objectToSend.Login,
                             password: '***'
                         });
@@ -114,6 +129,8 @@
                     else {
                         alert("Error when adding new router occured");
                     }
+
+                    $('#modalSpin').modal('hide');
 
                     $("#addRouterContainer").html("");
 
