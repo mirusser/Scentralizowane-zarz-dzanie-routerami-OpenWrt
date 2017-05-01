@@ -13,13 +13,15 @@
 
     <table class="table table-striped table-bordered">
         <thead class="thead-inverse">
-            <tr>
-                <th class="sort" data-sort="key">Key</th>
-                <th class="sort" data-sort="value">Value</th>
-                <th colspan="2">
-                    <input type="text" class="search" placeholder="Search configuration" />
-                </th>
-            </tr>
+        <tr>
+            <th colspan="2">
+                <input type="text" class="search form-control" placeholder="Search entity" />
+            </th>
+        </tr>
+        <tr>
+            <th class="sort" data-sort="key">Key</th>
+            <th class="sort" data-sort="value">Value</th>
+        </tr>
         </thead>
         <tbody class="list">
             @foreach (var item in Model)

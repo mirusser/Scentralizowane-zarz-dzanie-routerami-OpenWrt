@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using RouterManagement.Logic.Connections;
 using RouterManagement.Models.ViewModels;
 using System.Text.RegularExpressions;
+using NativeWifi;
 using RouterManagement.Models;
 
 namespace RouterManagement.Logic.Controllers
@@ -36,6 +37,14 @@ namespace RouterManagement.Logic.Controllers
             var allRouters = Routers.GetRoutersAsRouterAccesDataViewModel();
 
             return View(allRouters);
+        }
+
+        [HttpPost]
+        public ActionResult ReconnectAllRouter()
+        {
+            Routers.ReconnectAllRouters();
+
+            return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult AddRouterPartial()
@@ -123,6 +132,8 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult Wireless(string name = null)
         {
+            //var wlan = new WlanClient();  /play with this later
+
             name = name ?? Routers.GetFirstRouterName();
             if (name == null) return View("~/Views/Admin/NoRoutersError.cshtml");
             var sshConnection = Routers.GetConnectionByName(name);
@@ -132,12 +143,13 @@ namespace RouterManagement.Logic.Controllers
             var configurationTrimmed = new SendUciShowWirelessViewModel
             {
                 Disabled = (currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".disabled")).Value == "1"),
-                Channel = Convert.ToInt32(currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".channel")).Value),
+                Channel = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".channel")).Value,
                 Ssid = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".ssid")).Value,
                 Encryption = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".encryption")).Value,
                 Key = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".key")).Value,
                 Mode = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".mode")).Value,
-                Network = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".network")).Value
+                Network = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".network")).Value,
+                RouterName = string.IsNullOrEmpty(name) ? Routers.GetFirstRouterName() : name
             };
 
             return View(configurationTrimmed);
@@ -150,11 +162,13 @@ namespace RouterManagement.Logic.Controllers
         }
 
         [HttpPost]
-        public ActionResult SaveWirelessPartial(SendUciShowWirelessViewModel config, string name)
+        public ActionResult SaveWirelessPartial(SendUciShowWirelessViewModel config)
         {
+            if (!ModelState.IsValid) return Json(false, JsonRequestBehavior.AllowGet);
+
             try
             {
-                var sshConnection = Routers.GetConnectionByName(name);
+                var sshConnection = Routers.GetConnectionByName(config.RouterName);
                 if (sshConnection == null) throw new Exception();
 
                 sshConnection.Send_UciSetWireless(config);

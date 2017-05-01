@@ -1,9 +1,5 @@
 ﻿@model RouterManagement.Models.ViewModels.SendUciShowWirelessViewModel
     
-@{
-    var routerName = HttpContext.Current.Request["name"] ?? RouterManagement.Logic.Connections.Routers.GetFirstRouterName();
-}
-
 <div class="modal-content">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -12,130 +8,121 @@
     <div class="modal-body">
         <table class="table table-bordered">
             <tr>
-
                 <td class="disabled col-md-2">
+                    <label for="disabled-field">Disabled?</label>
                     <select class="form-control" id="disabled-field">
-                        @if (Model.Disabled)
-                        {
+                        @if (Model.Disabled){
                             <option value="true" selected>True</option>
                             <option value="false">False</option>
                         }
-                        else
-                        {
+                        else{
                             <option value="true">True</option>
                             <option value="false" selected>False</option>
                         }
                     </select>
                 </td>
 
-                <td class="channel col-md-2">
+                <td class="channel col-md-1">
+                    <label for="channel-field">Channel</label>
                     <select class="form-control" id="channel-field">
-                        @for (int i = 0; i < 13; i++)
+                        @for (var i = 0; i < 13; i++)
                         {
-                            if (Model.Channel == i)
-                            {
+                            if (Model.Channel == i.ToString()){
                                 <option value="@i" selected>@i</option>
                             }
-                            else
-                            {
+                            else{
                                 <option value="@i">@i</option>
                             }
                         }
+                        <option value="auto">Auto</option>
                     </select>
                 </td>
 
                 <td class="ssid col-md-2">
-                    <input type="text" class="form-control" id="ssid-field" value="@Model.Ssid" placeholder="SSID" />
+                    <label for="ssid-field">SSID</label>
+                    <input type="text" class="form-control" id="ssid-field" value="@Model.Ssid" placeholder="SSID"/>
                 </td>
 
-                <td class="encryption col-md-2">
+                <td class="encryption col-md-1">
+                    <label for="encryption-field">Encryption</label>
                     <select class="form-control" id="encryption-field">
-                        @if (Model.Encryption == "wep")
-                        {
+                        @if (Model.Encryption == "wep"){
                             <option value="wep" selected>WEP</option>
                         }
-                        else
-                        {
+                        else{
                             <option value="wep">WEP</option>
                         }
-                        @if (Model.Encryption == "psk")
-                        {
+                        @if (Model.Encryption == "psk"){
                             <option value="psk" selected>WPA-PSK</option>
                         }
-                        else
-                        {
+                        else{
                             <option value="psk">WPA-PSK</option>
                         }
-                        @if (Model.Encryption == "psk2")
-                        {
+                        @if (Model.Encryption == "psk2"){
                             <option value="psk2" selected>WPA2-PSK</option>
                         }
-                        else
-                        {
+                        else{
                             <option value="psk2">WPA2-PSK</option>
                         }
                     </select>
                 </td>
 
                 <td class="key col-md-2">
-                    <input type="text" class="form-control" id="key-field" value="@Model.Key" placeholder="Password" />
+                    <label for="key-field">Password</label>
+                    <input type="text" class="form-control" id="key-field" value="@Model.Key" placeholder="Password"/>
                 </td>
 
-                <td class="mode col-md-1">
+                <td class="mode col-md-2">
+                    <label for="form-field">Mode</label>
                     <select class="form-control" id="mode-field">
-                        @if (Model.Mode == "sta")
-                        {
+                        @if (Model.Mode == "sta"){
                             <option value="sta" selected>Station</option>
                         }
-                        else
-                        {
+                        else{
                             <option value="sta">Station</option>
                         }
-                        @if (Model.Mode == "ap")
-                        {
+                        @if (Model.Mode == "ap"){
                             <option value="ap" selected>Acces Point</option>
                         }
-                        else
-                        {
+                        else{
                             <option value="ap">Acces Point</option>
                         }
                     </select>
                 </td>
 
                 <td class="network col-md-1">
+                    <label for="network-field">Network</label>
                     <select class="form-control" id="network-field">
-                        @if (Model.Network == "lan")
-                        {
+                        @if (Model.Network == "lan"){
                             <option value="lan" selected>LAN</option>
                         }
-                        else
-                        {
+                        else{
                             <option value="lan">LAN</option>
                         }
-                        @if (Model.Network == "wan")
-                        {
+                        @if (Model.Network == "wan"){
                             <option value="wan" selected>WAN</option>
                         }
-                        else
-                        {
+                        else{
                             <option value="wan">WAN</option>
                         }
                     </select>
                 </td>
 
                 <td class="add col-md-1">
-                    <button id="addPublication-btn" class="btn btn-success">Save</button>
+                    <button id="addPublication-btn" class="btn btn-success col-md-12">Save</button>
                 </td>
             </tr>
         </table>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+        <button type="button" class="btn btn-default col-md-12" data-dismiss="modal">Zamknij</button>
     </div>
 </div>
 <script>
     $(document).ready(function () {
+        $('#modalSpin').modal('hide');
         $("#addPublication-btn").click(function () {
+            $('#modalSpin').modal('show');
             const objectToSend = {
                 Disabled: $('#disabled-field').val(),
                 Channel: $('#channel-field').val(),
@@ -144,26 +131,30 @@
                 Key: $('#key-field').val(),
                 Mode: $('#mode-field').val(),
                 Network: $('#network-field').val(),
+                RouterName: '@Model.RouterName'
             };
 
+            var valid = true;
+
             if (objectToSend.SSID.length === 0) {
-                alert("SSID can't be empty");
-                return;
+                $.notify("SSID can't be empty");
+                valid = false;
             }
 
             if (objectToSend.Key.length === 0) {
-                alert("Key can't be empty");
+                $.notify("Key can't be empty");
+                valid = false;
+            }
+
+            if (valid === false) {
+                $('#modalSpin').modal('hide');
                 return;
             }
 
             $.ajax({
                 type: "POST",
                 url: "/Admin/SaveWirelessPartial",
-                data:
-                {
-                    config: objectToSend,
-                    name: '@routerName'
-                },
+                data: objectToSend,
                 cache: false,
                 success: function (data) {
                     if (data) {
@@ -206,9 +197,10 @@
                         });
 
                     } else {
-                        alert("Error parsing request on server");
+                        $.notify("Error parsing request on server");
                     }
 
+                    $('#modalSpin').modal('hide');
 
                     $("#modifyPublicationContainer").html("");
 

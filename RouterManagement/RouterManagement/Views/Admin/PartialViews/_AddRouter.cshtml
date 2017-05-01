@@ -30,13 +30,13 @@
                     <input type="password" class="form-control" id="password-addField" />
                 </td>
                 <td>
-                    <button id="addRouter-btn" class="btn btn-success">Add</button>
+                    <button id="addRouter-btn" class="btn btn-success col-md-12">Add</button>
                 </td>
             </tr>
         </table>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default col-md-12" data-dismiss="modal">Close</button>
     </div>
 </div>
 
@@ -69,18 +69,22 @@
             }
             if (contains(usedNames, objectToSend.Name) && objectToSend.Name.length !== 0) {
                 $.notify("This name is in use");
+                valid = false;
             }
 
             if (!validateIpOrDomain(objectToSend.RouterIp)) {
                 $.notify("You have typed router adress in not proper format");
+                valid = false;
             }
 
             if (!validateNumberOrEmpty(objectToSend.Port)) {
                 $.notify("You have typed adresses in not proper format");
+                valid = false;
             }
 
             if (objectToSend.Login.length === 0) {
                 $.notify("You have to type login");
+                valid = false;
             }
 
             if (valid === false) {

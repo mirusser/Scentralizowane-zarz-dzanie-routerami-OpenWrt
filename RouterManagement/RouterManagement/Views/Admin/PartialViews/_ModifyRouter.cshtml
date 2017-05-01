@@ -9,23 +9,23 @@
         <table class="table table-bordered">
             <tr>
                 <td>
-                    <p>Friendly name</p>
+                    <label for="name-modifyField">Friendly name</label>
                     <input type="text" class="form-control" id="name-modifyField" value="@Model.Name" placeholder="eg. router in salon" />
                 </td>
                 <td>
-                    <p>Ip/host adress</p>
+                    <label for="routerIp-modifyField">Ip/host adress</label>
                     <input type="text" class="form-control" id="routerIp-modifyField" value="@Model.RouterIp" placeholder="eg. 192.168.1.1" />
                 </td>
                 <td>
-                    <p>Port</p>
+                    <label for="port-modifyField">Port</label>
                     <input type="text" class="form-control" id="port-modifyField" value="@Model.Port" placeholder="eg. 22" />
                 </td>
                 <td>
-                    <p>Login</p>
+                    <label for="login-modifyField">Login</label>
                     <input type="text" class="form-control" id="login-modifyField" value="@Model.Login" placeholder="eg. root" />
                 </td>
                 <td>
-                    <p>Password</p>
+                    <label for="password-modifyField">Password</label>
                     <input type="password" class="form-control" value="@Model.Password" id="password-modifyField" />
                 </td>
                 <td>
@@ -35,7 +35,7 @@
         </table>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default col-md-12" data-dismiss="modal">Close</button>
     </div>
 </div>
 
@@ -69,18 +69,22 @@
             }
             if (contains(usedNames, objectToSend.Name) && objectToSend.Name.length !== 0) {
                 $.notify("This name is in use");
+                valid = false;
             }
 
             if (!validateIpOrDomain(objectToSend.RouterIp)) {
                 $.notify("You have typed router adresses in not proper format");
+                valid = false;
             }
 
             if (!validateNumberOrEmpty(objectToSend.Port)) {
                 $.notify("You have typed adress in not proper format");
+                valid = false;
             }
 
             if (objectToSend.Login.length === 0) {
                 $.notify("You have to type login");
+                valid = false;
             }
 
             if (valid === false) {

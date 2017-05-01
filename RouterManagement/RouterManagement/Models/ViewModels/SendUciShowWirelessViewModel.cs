@@ -1,16 +1,30 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using RouterManagement.Logic.DataAnnotations;
 
 namespace RouterManagement.Models.ViewModels
 {
     public class SendUciShowWirelessViewModel
     {
         public bool Disabled { get; set; }
-        [Range(0, 13)]//TODO check it
-        public int Channel { get; set; }
+
+        [RegularExpression(@"^((1[0-3])|[0-9]|(auto))$")]
+        public string Channel { get; set; }
+
+        [StringNotNullNotEmpty]
         public string Ssid { get; set; }
-        public string Encryption = "psk2";
+
+        [RegularExpression(@"^(wep)|(psk(2)?)$")]
+        public string Encryption { get; set; } = "psk2";
+
         public string Key { get; set; }
-        public string Mode { get; set; } //sta or ap
-        public string Network { get; set; } //lan or wan
+
+        [RegularExpression(@"^(sta)|(ap)$")]
+        public string Mode { get; set; }
+
+        [RegularExpression(@"^(lan)|(wan)$")]
+        public string Network { get; set; }
+
+        [StringNotNullNotEmpty]
+        public string RouterName { get; set; }
     }
 }

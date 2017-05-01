@@ -55,6 +55,8 @@
         </tbody>
     </table>
     <button id="addRouterBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Add router</button>
+    <p></p>
+    <button id="reconnectBtn" class="btn btn-primary btn-product col-md-12 col-xs-12">Try reconnect all</button>
 </div>
 
 <div id="modifyRouterModal" class="modal fade in" data-url='@Url.Action("ModifyRouterPartial")'>
@@ -90,6 +92,23 @@
             });
         });
 
+        $(document).on('click', '#reconnectBtn', function () {
+            $('#modalSpin').modal('show');
+
+            $.ajax({
+                type: "POST",
+                url: "/Admin/ReconnectAllRouter",
+                cache: false,
+                success: function (result) {
+                    if (!result) {
+                        $.notify("There was a problem when trying reconnect all routers");
+                    }
+
+                    $('#modalSpin').modal('hide');
+                }
+            });
+        });
+
         $(document).on('click', '.edit-item', function () {
             $('#modalSpin').modal('show');
             const routerName = $(this).closest('tr').find('.name').text();
@@ -110,6 +129,7 @@
         $(document).on('click', '.remove-item', function () {
             $('#modalSpin').modal('show');
             const name = $(this).closest('tr').find('.name').text();
+
             $.ajax({
                 type: "POST",
                 url: "/Admin/RemoveRouter",
@@ -122,7 +142,7 @@
                         routersList.remove('name', name);
                     }
                     else {
-                        $.notify("There was a problem when deleting router.");
+                        $.notify("There was a problem when deleting router");
                     }
 
                     $('#modalSpin').modal('hide');

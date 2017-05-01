@@ -2,7 +2,6 @@
 {
     public interface ISshConnection
     {
-        bool IsConnected();
         string SendCommand(string customCmd);
     }
 }

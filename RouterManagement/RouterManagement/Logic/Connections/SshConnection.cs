@@ -18,9 +18,9 @@ namespace RouterManagement.Logic.Connections
         #region properties
 
         public SshClient sshclient { get; }
-        private ShellStream stream;
-        private StreamWriter writer;
-        private StreamReader reader;
+        public bool IsConnected => sshclient != null && sshclient.IsConnected;
+
+        private ShellStream shellStream;
 
         #endregion
 
@@ -88,19 +88,32 @@ namespace RouterManagement.Logic.Connections
                 return;
             }
 
-            stream = sshclient.CreateShellStream("cmd", 80, 24, 800, 600, 1024);
-            reader = new StreamReader(stream);
-            writer = new StreamWriter(stream)
-            {
-                AutoFlush = true
-            };
+            shellStream = sshclient.CreateShellStream("cmd", 80, 24, 800, 600, 1024);
 
             SendCommand("reset");
         }
 
-        public bool IsConnected()
+        public string SendCommand(string customCmd)
         {
-            return sshclient != null && sshclient.IsConnected;
+            var reader = new StreamReader(shellStream);
+            reader.ReadToEnd(); //clear stream from old data
+            writeStream(customCmd);
+
+            var strAnswer = new StringBuilder();
+            strAnswer.AppendLine(reader.ReadToEnd());
+            var answer = strAnswer.ToString().Trim();
+
+            if (answer.Contains(string.Concat("-ash: ", customCmd, ": not found")))
+            {
+                throw new InvalidOperationException(string.Concat("Unrecognized command: ", customCmd));
+            }
+
+            if (answer.Contains("Entry not found"))
+            {
+                throw new InvalidOperationException(string.Concat("Entry not found for command: ", customCmd));
+            }
+
+            return answer;
         }
 
         public Dictionary<string, string> Send_UciShow()
@@ -135,6 +148,10 @@ namespace RouterManagement.Logic.Connections
 
             writeStream($"uci commit");
             writeStream($"wifi");
+
+            Thread.Sleep(15000);
+
+            writeStream("clear");
         }
 
         public Dictionary<string, string> Send_UciShowFirewall()
@@ -166,29 +183,6 @@ namespace RouterManagement.Logic.Connections
             writeStream($"uci commit firewall");
 
             return id;
-        }
-
-        public string SendCommand(string customCmd)
-        {
-            var strAnswer = new StringBuilder();
-
-            writeStream(customCmd);
-
-            strAnswer.AppendLine(readStream());
-
-            var answer = strAnswer.ToString().Trim();
-
-            if (answer.Contains(string.Concat("-ash: ", customCmd, ": not found")))
-            {
-                throw new InvalidOperationException(string.Concat("Unrecognized command: ", customCmd));
-            }
-
-            if (answer.Contains("Entry not found"))
-            {
-                throw new InvalidOperationException(string.Concat("Entry not found for command: ", customCmd));
-            }
-
-            return answer;
         }
 
         #region fake methods
@@ -281,24 +275,12 @@ namespace RouterManagement.Logic.Connections
 
         private void writeStream(string cmd)
         {
+            var writer = new StreamWriter(shellStream) {AutoFlush = true};
             writer.WriteLine(cmd);
-            while (stream.Length == 0)
+            while (shellStream.Length == 0)
             {
                 Thread.Sleep(500);
             }
-        }
-
-        private string readStream()
-        {
-            var result = new StringBuilder();
-
-            string line;
-            while ((line = reader.ReadLine()) != null)
-            {
-                result.AppendLine(line);
-            }
-
-            return result.ToString();
         }
 
         private int getNewId()
@@ -312,10 +294,11 @@ namespace RouterManagement.Logic.Connections
                 {
                     ids.Add((int)char.GetNumericValue(r[14]));
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
             }
-
-
             return ids.Any() ? ids.Max() + 1 : 1;
         }
 
