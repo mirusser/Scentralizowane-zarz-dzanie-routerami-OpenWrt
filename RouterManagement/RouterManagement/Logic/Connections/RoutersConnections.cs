@@ -6,6 +6,7 @@ using RouterManagement.Logic.Repositories;
 using RouterManagement.Models;
 using RouterManagement.Models.Context;
 using RouterManagement.Models.ViewModels;
+using RouterManagement.Models.ViewModels.Router;
 
 namespace RouterManagement.Logic.Connections
 {
@@ -75,9 +76,9 @@ namespace RouterManagement.Logic.Connections
             Initialize();
         }
 
-        public static List<RouterActivityDataViewModel> GetRoutersAsRouterAccesDataViewModel()
+        public static List<RouterActivityViewModel> GetRoutersAsRouterAccesDataViewModel()
         {
-            var allRouters = new List<RouterActivityDataViewModel>();
+            var allRouters = new List<RouterActivityViewModel>();
 
             using (var uow = new DataContextUoW(new RouterManagementEntities()))
             {
@@ -86,7 +87,7 @@ namespace RouterManagement.Logic.Connections
                 {
                     var currentRouter = RouterDataList.FirstOrDefault(it => it.Name == r.Name);
 
-                    var toAdd = new RouterActivityDataViewModel
+                    var toAdd = new RouterActivityViewModel
                     {
                         Name = r.Name,
                         IsActive = currentRouter != null && currentRouter.IsActive,

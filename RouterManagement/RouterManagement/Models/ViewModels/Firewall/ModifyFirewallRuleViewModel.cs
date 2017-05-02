@@ -1,10 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using RouterManagement.Logic.DataAnnotations;
-
-namespace RouterManagement.Models.ViewModels
+﻿namespace RouterManagement.Models.ViewModels.Firewall
 {
-    public class AddFirewallRuleViewModel
+    public class ModifyFirewallRuleViewModel
     {
+        public string RouterName { get; set; }
         public string RuleName { get; set; }
         public string FriendlyName { get; set; }
         public string Src_mac { get; set; }

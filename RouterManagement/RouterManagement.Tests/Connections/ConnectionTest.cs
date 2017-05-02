@@ -42,7 +42,7 @@ namespace RouterManagement.Tests.Connections
         public void SendAndGetMessage_Succes()
         {
             var test1 = new SshConnection("192.168.1.1", "root", "konopie");
-            var answer = test1.SendCommand("uci show");
+            var answer = test1.Send_CustomCommand("uci show");
 
             Assert.IsFalse(string.IsNullOrEmpty(answer));
         }
@@ -52,7 +52,7 @@ namespace RouterManagement.Tests.Connections
         public void SendAndGetMessage_Failed()
         {
             var test1 = new SshConnection("192.168.1.1", "root", "konopie");
-            var answer = test1.SendCommand("cecjnw");
+            var answer = test1.Send_CustomCommand("cecjnw");
 
             Assert.IsFalse(string.IsNullOrEmpty(answer));
         }
@@ -61,7 +61,7 @@ namespace RouterManagement.Tests.Connections
         public void Send_UciShow_Succes()
         {
             var test1 = new SshConnection("192.168.1.1", "root", "konopie");
-            var answer = test1.Send_UciShow();
+            var answer = test1.Get_FullConfiguration();
 
             Assert.IsTrue(answer != null);
             Assert.IsTrue(answer.Count > 0);
@@ -71,7 +71,7 @@ namespace RouterManagement.Tests.Connections
         public void Send_UciShowWireless_Succes()
         {
             var test1 = new SshConnection("192.168.1.1", "root", "konopie");
-            var answer = test1.Send_UciShowWireless();
+            var answer = test1.Get_Wireless();
 
             Assert.IsTrue(answer != null);
             Assert.IsTrue(answer.Count > 0);

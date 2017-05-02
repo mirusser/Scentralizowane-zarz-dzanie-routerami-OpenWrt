@@ -1,4 +1,4 @@
-﻿@model List<RouterManagement.Models.ViewModels.RouterActivityDataViewModel>
+﻿@model List<RouterManagement.Models.ViewModels.Router.RouterActivityViewModel>
 
 @Scripts.Render("~/bundles/ListJS")
 
@@ -34,7 +34,7 @@
                             @:22
                         }
                         else{
-                            @r.Login
+                            @r.Port
                         }
                     </td>
                     <td class="login">@r.Login</td>

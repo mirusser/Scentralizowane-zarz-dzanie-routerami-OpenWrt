@@ -1,4 +1,4 @@
-﻿@model RouterManagement.Models.ViewModels.SendUciShowWirelessViewModel
+﻿@model RouterManagement.Models.ViewModels.Wireless.WirelessViewModel
 
 @Scripts.Render("~/bundles/ListJS")
 
@@ -9,7 +9,7 @@
 <h2>Current wireless configuration</h2>
 <hr>
 <div id="configurations">
-    @Html.Partial("PartialViews/_SelectRouter")
+    @Html.Partial("RouterPartialViews/_SelectRouter")
 
     <div class="alert alert-warning">
         <strong>Warnig!</strong> Changing these settings may cause disconnection to the network!

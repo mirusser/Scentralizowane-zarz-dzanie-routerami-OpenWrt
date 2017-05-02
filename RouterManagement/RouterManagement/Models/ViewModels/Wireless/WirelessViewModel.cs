@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RouterManagement.Logic.DataAnnotations;
 
-namespace RouterManagement.Models.ViewModels
+namespace RouterManagement.Models.ViewModels.Wireless
 {
-    public class SendUciShowWirelessViewModel
+    public class WirelessViewModel
     {
         public bool Disabled { get; set; }
 

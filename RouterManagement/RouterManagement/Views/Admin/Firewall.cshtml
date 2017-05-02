@@ -1,4 +1,4 @@
-﻿@model RouterManagement.Models.ViewModels.FirewallViewModel
+﻿@model RouterManagement.Models.ViewModels.Firewall.FirewallViewModel
 
 @Scripts.Render("~/bundles/ListJS")
 
@@ -9,81 +9,46 @@
 <h2>Current firewall rules</h2>
 <hr>
 <div id="rules">
-    @Html.Partial("PartialViews/_SelectRouter")
-    
+    @Html.Partial("RouterPartialViews/_SelectRouter")
+
     <div class="alert alert-warning">
-        <strong>Warnig!</strong> You can only see and modify rules created by this program!
+        <strong>Warnig!</strong> You can only see and modify rules created by this software!
     </div>
 
     <table class="table table-striped table-bordered">
         <thead class="thead-inverse">
-        <tr>
-            <th class="sort" data-sort="RuleName">Rule Name</th>
-            <th class="sort" data-sort="FriendlyName">Name</th>
-            <th class="sort" data-sort="Src_mac">Source mac</th>
-            <th class="sort" data-sort="Src_ip">Source ip</th>
-            <th class="sort" data-sort="Src_port">Source port</th>
-            <th class="sort" data-sort="Dest_ip">Dest ip</th>
-            <th class="sort" data-sort="Dest_port">Dest port</th>
-            <th class="sort" data-sort="Enabled">Is enabled?</th>
-            <th colspan="2">
-                <input type="text" class="search form-control input-sm" placeholder="Search entity..."/>
-            </th>
+            <tr>
+                <th class="sort" data-sort="RuleName">Rule Name</th>
+                <th class="sort" data-sort="FriendlyName">Name</th>
+                <th class="sort" data-sort="Src_mac">Source mac</th>
+                <th class="sort" data-sort="Src_ip">Source ip</th>
+                <th class="sort" data-sort="Src_port">Source port</th>
+                <th class="sort" data-sort="Dest_ip">Dest ip</th>
+                <th class="sort" data-sort="Dest_port">Dest port</th>
+                <th class="sort" data-sort="Enabled">Is enabled?</th>
+                <th colspan="2">
+                    <input type="text" class="search form-control input-sm" placeholder="Search entity..." />
+                </th>
 
-        </tr>
+            </tr>
         </thead>
         <tbody class="list">
             @foreach (var f in Model.FirewallRestrictionRules)
             {
+                var srcMac = (f.Src_mac != null) ? string.Join(Environment.NewLine, f.Src_mac) : string.Empty;
+                var srcIp = (f.Src_ip != null) ? string.Join(Environment.NewLine, f.Src_ip) : string.Empty;
+                var srcPort = (f.Src_port != null) ? string.Join(Environment.NewLine, f.Src_port) : string.Empty;
+                var destIp = (f.Dest_ip != null) ? string.Join(Environment.NewLine, f.Dest_ip) : string.Empty;
+                var destPort = (f.Dest_port != null) ? string.Join(Environment.NewLine, f.Dest_port) : string.Empty;
+
                 <tr>
                     <td class="ruleName">@f.RuleName</td>
                     <td class="friendlyName">@f.FriendlyName</td>
-
-                    @if (f.Src_mac != null)
-                    {
-                        <td class="src_mac">@string.Join(Environment.NewLine, f.Src_mac)</td>
-                    }
-                    else
-                    {
-                        <td class="src_mac">@string.Empty</td>
-                    }
-
-                    @if (f.Src_ip != null)
-                    {
-                        <td class="src_ip">@string.Join(Environment.NewLine, f.Src_ip)</td>
-                    }
-                    else
-                    {
-                        <td class="src_ip">@string.Empty</td>
-                    }
-
-                    @if (f.Src_port != null)
-                    {
-                        <td class="src_port">@string.Join(Environment.NewLine, f.Src_port)</td>
-                    }
-                    else
-                    {
-                        <td class="src_port">@string.Empty</td>
-                    }
-
-                    @if (f.Dest_ip != null)
-                    {
-                        <td class="dest_ip">@string.Join(Environment.NewLine, f.Dest_ip)</td>
-                    }
-                    else
-                    {
-                        <td class="dest_ip">@string.Empty</td>
-                    }
-
-                    @if (f.Dest_port != null)
-                    {
-                        <td class="dest_port">@string.Join(Environment.NewLine, f.Dest_port)</td>
-                    }
-                    else
-                    {
-                        <td class="dest_port">@string.Empty</td>
-                    }
-
+                    <td class="src_mac">@srcMac</td>
+                    <td class="src_ip">@srcIp</td>
+                    <td class="src_port">@srcPort</td>
+                    <td class="dest_ip">@destIp</td>
+                    <td class="dest_port">@destPort</td>
                     <td class="enabled">@f.Enabled</td>
                     <td class="edit"><button class="edit-item btn btn-primary col-md-12 col-xs-12">Edit</button></td>
                     <td class="remove"><button class="remove-item btn btn-danger col-md-12 col-xs-12">Delete</button></td>
@@ -96,6 +61,10 @@
 
 <div id="addRuleModal" class="modal fade in" data-url='@Url.Action("AddRulePartial")'>
     <div id="addRuleContainer"></div>
+</div>
+
+<div id="modifyRuleModal" class="modal fade in" data-url='@Url.Action("ModifyRulePartial")'>
+    <div id="modifyRuleContainer"></div>
 </div>
 
 <script>
@@ -123,33 +92,24 @@
             });
         });
 
-        //$(document).on('click', '.edit-item', function () {
-        //    const publicationId = $(this).closest('tr').find('.id').text();
-        //    const item = publicationList.get('id', publicationId)[0];
+        $(document).on('click', '.edit-item', function () {
+            const url = $('#modifyRuleModal').data('url');
+            const ruleName = $(this).closest('tr').find('.ruleName').text();
 
-        //    const objectToSend = {
-        //        Id: item._values.id,
-        //        TeacherAuthorsId: item._values.teacherAuthorsId,
-        //        AnotherAuthors: item._values.anotherAuthors,
-        //        Title: item._values.anotherAuthors,
-        //        PublishedIn: item._values.publishedIn,
-        //        AdditionalInfo: item._values.additionalInfo
-        //    };
-
-        //    const url = $('#modifyPublicationModal').data('url');
-
-        //    $.ajax({
-        //        type: "POST",
-        //        url: url,
-        //        data: objectToSend,
-        //        cache: false,
-        //        success: function (data) {
-        //            $('#modifyPublicationContainer').html(data);
-
-        //            $('#modifyPublicationModal').appendTo("body").modal('show');
-        //        }
-        //    });
-        //});
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    RuleName: ruleName,
+                    RouterName: '@Model.RouterName'
+                },
+                cache: false,
+                success: function (data) {
+                    $('#modifyRuleContainer').html(data);
+                    $('#modifyRuleModal').appendTo("body").modal('show');
+                }
+            });
+        });
 
         $(document).on('click', '.remove-item', function () {
             var ruleName = $(this).closest('tr').find('.ruleName').text();
@@ -157,8 +117,8 @@
                 type: "POST",
                 url: "/Admin/RemoveRule",
                 data: {
-                    ruleName: ruleName,
-                    routerName: '@Model.RouterName'
+                    RuleName: ruleName,
+                    RouterName: '@Model.RouterName'
                 },
                 cache: false,
                 success: function (result) {

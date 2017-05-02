@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RouterManagement.Models.ViewModels
+namespace RouterManagement.Models.ViewModels.Firewall
 {
     public class FirewallViewModel
     {

@@ -1,6 +1,6 @@
 ﻿using RouterManagement.Logic.Connections;
 
-namespace RouterManagement.Models.ViewModels
+namespace RouterManagement.Models.ViewModels.Router
 {
     public class RouterOnListViewModel
     {

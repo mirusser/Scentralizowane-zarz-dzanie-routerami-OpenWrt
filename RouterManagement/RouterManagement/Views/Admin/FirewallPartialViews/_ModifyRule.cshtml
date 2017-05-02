@@ -1,0 +1,171 @@
+﻿@model RouterManagement.Models.ViewModels.Firewall.ModifyFirewallRuleViewModel
+
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Edit router</h4>
+    </div>
+    <div class="modal-body">
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    <label for="friendlyName-modifyField">Friendly name</label>
+                    <input type="text" class="form-control" id="friendlyName-modifyField" value="@Model.FriendlyName" placeholder="eg. sister tablet" />
+                </td>
+
+                <td>
+                    <label for="src_mac-modifyField">Source mac</label>
+                    <input type="text" class="form-control" id="src_mac-modifyField" value="@Model.Src_mac"  placeholder="eg. 6C:5F:1C:9E:F5:53,6C:5F:1C:9E:F5:53"/>
+                </td>
+
+                <td>
+                    <label for="src_ip-modifyField">Source ip</label>
+                    <input type="text" class="form-control" id="src_ip-modifyField" value="@Model.Src_ip"  placeholder="eg. 192.168.1.101,192.168.1.102"/>
+                </td>
+
+                <td>
+                    <label for="src_port-modifyField">Source port</label>
+                    <input type="text" class="form-control" id="src_port-modifyField" value="@Model.Src_port"  placeholder="eg. 22,1300-1400"/>
+                </td>
+
+                <td>
+                    <label for="dest_ip-modifyField">Destination IP</label>
+                    <input type="text" class="form-control" id="dest_ip-modifyField" value="@Model.Dest_ip"  placeholder="eg. 192.168.1.101,192.168.1.102"/>
+                </td>
+
+                <td>
+                    <label for="dest_port-modifyField">Destination port</label>
+                    <input type="text" class="form-control" id="dest_port-modifyField" value="@Model.Dest_port"  placeholder="eg. 22,1300-1400"/>
+                </td>
+                
+                <td>
+                    <label for="active-modifyField">Enabled</label>
+                    <select class="form-control" id="active-modifyField">
+                        @if (Model.Enabled == "1"){
+                            <option value="1" selected>True</option>
+                            <option value="0">False</option>
+                        }
+                        else{
+                            <option value="1">True</option>
+                            <option value="0" selected>False</option>
+                        }
+
+                    </select>
+                </td>
+
+                <td>
+                    <button id="modifyRule-btn" class="btn btn-success">Modify</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default col-md-12" data-dismiss="modal">Close</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#modalSpin').modal('hide');
+
+        $("#modifyRule-btn").click(function () {
+            //$('#modalSpin').modal('show');
+
+            const objectToSend = {
+                RouterName: '@Model.RouterName',
+                RuleName: '@Model.RuleName',
+                FriendlyName: $('#friendlyName-modifyField').val(),
+                Src_mac: $('#src_mac-modifyField').val(),
+                Src_ip: $('#src_ip-modifyField').val(),
+                Src_port: $('#src_port-modifyField').val(),
+                Dest_ip: $('#dest_ip-modifyField').val(),
+                Dest_port: $('#dest_port-modifyField').val(),
+                Enabled: $('#active-modifyField').val()
+            };
+
+            var valid = true;
+
+            if (objectToSend.FriendlyName.length === 0) {
+                $.notify("You have to type rule name");
+                valid = false;
+            }
+
+            if (objectToSend.Src_mac.length === 0 &&
+                objectToSend.Src_ip.length === 0 &&
+                objectToSend.Src_port.length === 0 &&
+                objectToSend.Dest_ip.length === 0 &&
+                objectToSend.Dest_port.length === 0) {
+                $.notify("You have to type at least one condition");
+                valid = false;
+            }
+
+            if (valid === false) {
+                //$('#modalSpin').modal('hide');
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/Admin/ModifyRule",
+                data: objectToSend,
+                cache: false,
+                success: function (result) {
+                    if (result.status) {
+
+                        rulesList.remove('ruleName', '@Model.RuleName');
+
+                        rulesList.add({
+                            ruleName: result.ruleName,
+                            friendlyName: objectToSend.FriendlyName,
+                            src_mac: objectToSend.Src_mac,
+                            src_ip: objectToSend.Src_ip,
+                            src_port: objectToSend.Src_port,
+                            dest_ip: objectToSend.Dest_ip,
+                            dest_port: objectToSend.Dest_port,
+                            enabled: objectToSend.Enabled
+                        });
+                    }
+                    else {
+                        $.notify("Error when modyfying rule occured");
+                    }
+
+                    //$('#modalSpin').modal('hide');
+
+                    $("#modifyRuleContainer").html("");
+
+                    $('#modifyRuleModal').modal('hide');
+                }
+            });
+        });
+
+        function validateIpOrDomain(inputText) {
+            const format = /^((((([a-zA-Z]+|[a-zA-Z0-9]*)\.)+)(([a-zA-Z]+[a-zA-Z0-9]*)+))|((\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5])))|(localhost))$/;
+            if (inputText.match(format) != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        function validateNumberOrEmpty(inputText) {
+            const format = /^(\s*|\d+)$/;
+            if (inputText.match(format) != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        function contains(a, obj) {
+            var i = a.length;
+            while (i--) {
+                if (a[i] == obj) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    });
+</script>

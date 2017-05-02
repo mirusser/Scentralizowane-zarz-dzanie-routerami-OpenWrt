@@ -2,6 +2,6 @@
 {
     public interface ISshConnection
     {
-        string SendCommand(string customCmd);
+        string Send_CustomCommand(string customCmd);
     }
 }

@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using RouterManagement.Logic.DataAnnotations;
 
-namespace RouterManagement.Models.ViewModels
+namespace RouterManagement.Models.ViewModels.Router
 {
-    public class AddRouterDataViewModel
+    public class ModifyRouterPartialViewModel
     {
         [StringNotNullNotEmpty]
         public string Name { get; set; }
@@ -13,5 +14,7 @@ namespace RouterManagement.Models.ViewModels
         [StringNotNullNotEmpty]
         public string Login { get; set; }
         public string Password { get; set; }
+        [NotNull]
+        public IEnumerable<string> AllRoutersNames { get; set; }
     }
 }

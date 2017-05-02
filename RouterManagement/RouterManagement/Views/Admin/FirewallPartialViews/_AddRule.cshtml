@@ -59,6 +59,7 @@
     $(document).ready(function () {
         $("#addRule-btn").click(function () {
             const objectToSend = {
+                RouterName: '@Model',
                 FriendlyName: $('#friendlyName-addField').val(),
                 Src_mac: $('#src_mac-addField').val(),
                 Src_ip: $('#src_ip-addField').val(),
@@ -78,7 +79,7 @@
                 objectToSend.Src_port.length === 0 &&
                 objectToSend.Dest_ip.length === 0 &&
                 objectToSend.Dest_port.length === 0) {
-                alert("You have to at least one condition");
+                alert("You have to type at least one condition");
                 return;
             }
 
@@ -86,12 +87,8 @@
             
             $.ajax({
                 type: "POST",
-                url: "/Admin/SaveRule",
-                data:
-                {
-                    restrictionRule: objectToSend,
-                    routerName: '@Model'
-                },
+                url: "/Admin/AddRule",
+                data: objectToSend,
                 cache: false,
                 success: function (result) {
                     if (rulesList.items.length === 0) {
@@ -101,7 +98,7 @@
                     if (result.status) {
                         rulesList.add({
                             ruleName: result.ruleName,
-                            friendlyName: objectToSend.FriendlyNAme,
+                            friendlyName: objectToSend.FriendlyName,
                             src_mac: objectToSend.Src_mac,
                             src_ip: objectToSend.Src_ip,
                             src_port: objectToSend.Src_port,
