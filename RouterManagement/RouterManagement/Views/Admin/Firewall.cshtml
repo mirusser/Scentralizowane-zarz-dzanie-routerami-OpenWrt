@@ -1,60 +1,92 @@
-﻿@model List<RouterManagement.Models.ViewModels.FirewallViewModel>
+﻿@model RouterManagement.Models.ViewModels.FirewallViewModel
 
 @Scripts.Render("~/bundles/ListJS")
 
 @{
     ViewBag.Title = "Firewall";
-    var routerName = HttpContext.Current.Request["name"] ?? RouterManagement.Logic.Connections.Routers.GetFirstRouterName();
 }
 
 <h2>Current firewall rules</h2>
 <hr>
 <div id="rules">
     @Html.Partial("PartialViews/_SelectRouter")
+    
+    <div class="alert alert-warning">
+        <strong>Warnig!</strong> You can only see and modify rules created by this program!
+    </div>
 
     <table class="table table-striped table-bordered">
         <thead class="thead-inverse">
-            <tr>
-                <th class="sort" data-sort="Id">Id</th>
-                <th class="sort" data-sort="Type">Type</th>
-                <th class="sort" data-sort="Is_Ingreee">Is ingreee?</th>
-                <th class="sort" data-sort="Description">Description</th>
-                <th class="sort" data-sort="Local_addr">Addresses</th>
-                <th class="sort" data-sort="Active_hours">Active hours</th>
-                <th class="sort" data-sort="Enabled">Enabled?</th>
-                <th colspan="2">
-                    <input type="text" class="search" placeholder="Search entity" />
-                </th>
-            </tr>
+        <tr>
+            <th class="sort" data-sort="RuleName">Rule Name</th>
+            <th class="sort" data-sort="FriendlyName">Name</th>
+            <th class="sort" data-sort="Src_mac">Source mac</th>
+            <th class="sort" data-sort="Src_ip">Source ip</th>
+            <th class="sort" data-sort="Src_port">Source port</th>
+            <th class="sort" data-sort="Dest_ip">Dest ip</th>
+            <th class="sort" data-sort="Dest_port">Dest port</th>
+            <th class="sort" data-sort="Enabled">Is enabled?</th>
+            <th colspan="2">
+                <input type="text" class="search form-control input-sm" placeholder="Search entity..."/>
+            </th>
+
+        </tr>
         </thead>
         <tbody class="list">
-            @foreach (var f in Model)
+            @foreach (var f in Model.FirewallRestrictionRules)
             {
                 <tr>
-                    <td class="id">@f.Id</td>
-                    <td class="type">@f.Type</td>
-                    <td class="isIngreee">@f.Is_Ingreee</td>
-                    <td class="description">@f.Description</td>
-                    @if (f.Local_addr != null)
+                    <td class="ruleName">@f.RuleName</td>
+                    <td class="friendlyName">@f.FriendlyName</td>
+
+                    @if (f.Src_mac != null)
                     {
-                        <td class="local_addr">@String.Join(Environment.NewLine, f.Local_addr)</td>
+                        <td class="src_mac">@string.Join(Environment.NewLine, f.Src_mac)</td>
                     }
                     else
                     {
-                        <td class="local_addr">@String.Empty</td>
+                        <td class="src_mac">@string.Empty</td>
                     }
 
-                    @if (f.Active_hours != null)
+                    @if (f.Src_ip != null)
                     {
-                        <td class="active_hours">@String.Join(Environment.NewLine, f.Active_hours)</td>
+                        <td class="src_ip">@string.Join(Environment.NewLine, f.Src_ip)</td>
                     }
                     else
                     {
-                        <td class="active_hours">@String.Empty</td>
+                        <td class="src_ip">@string.Empty</td>
                     }
+
+                    @if (f.Src_port != null)
+                    {
+                        <td class="src_port">@string.Join(Environment.NewLine, f.Src_port)</td>
+                    }
+                    else
+                    {
+                        <td class="src_port">@string.Empty</td>
+                    }
+
+                    @if (f.Dest_ip != null)
+                    {
+                        <td class="dest_ip">@string.Join(Environment.NewLine, f.Dest_ip)</td>
+                    }
+                    else
+                    {
+                        <td class="dest_ip">@string.Empty</td>
+                    }
+
+                    @if (f.Dest_port != null)
+                    {
+                        <td class="dest_port">@string.Join(Environment.NewLine, f.Dest_port)</td>
+                    }
+                    else
+                    {
+                        <td class="dest_port">@string.Empty</td>
+                    }
+
                     <td class="enabled">@f.Enabled</td>
-                    <td class="edit"><button class="edit-item btn btn-primary">Edit</button></td>
-                    <td class="remove"><button class="remove-item btn btn-danger">Delete</button></td>
+                    <td class="edit"><button class="edit-item btn btn-primary col-md-12 col-xs-12">Edit</button></td>
+                    <td class="remove"><button class="remove-item btn btn-danger col-md-12 col-xs-12">Delete</button></td>
                 </tr>
             }
         </tbody>
@@ -68,7 +100,7 @@
 
 <script>
     var options = {
-        valueNames: ['id', 'type', 'is_Ingreee', 'description', 'local_addr', 'active_hours', 'enabled']
+        valueNames: ['ruleName', 'friendlyName', 'src_mac', 'src_ip', 'src_port', 'dest_ip', 'dest_port', 'enabled']
     };
 
     var rulesList = new List('rules', options);
@@ -80,6 +112,9 @@
             $.ajax({
                 type: "POST",
                 url: url,
+                data: {
+                    routerName: '@Model.RouterName'
+                },
                 cache: false,
                 success: function (data) {
                     $('#addRuleContainer').html(data);
@@ -117,18 +152,18 @@
         //});
 
         $(document).on('click', '.remove-item', function () {
-            var ruleId = $(this).closest('tr').find('.id').text();
+            var ruleName = $(this).closest('tr').find('.ruleName').text();
             $.ajax({
                 type: "POST",
                 url: "/Admin/RemoveRule",
                 data: {
-                    ruleId: ruleId,
-                    name: '@routerName'
+                    ruleName: ruleName,
+                    routerName: '@Model.RouterName'
                 },
                 cache: false,
                 success: function (result) {
                     if (result) {
-                        rulesList.remove("id", ruleId);
+                        rulesList.remove("ruleName", ruleName);
                     }
                     else {
                         alert("There was a problem when deleting rule.");

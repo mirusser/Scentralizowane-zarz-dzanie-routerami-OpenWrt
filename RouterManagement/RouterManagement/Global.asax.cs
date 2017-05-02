@@ -16,7 +16,7 @@ namespace RouterManagement
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             Database.SetInitializer<RouterManagementEntities>(null);
-            Routers.Initialize();
+            RoutersConnections.Initialize();
         }
     }
 }

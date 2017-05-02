@@ -1,6 +1,4 @@
-﻿@{
-    var routerName = HttpContext.Current.Request["name"] ?? RouterManagement.Logic.Connections.Routers.GetFirstRouterName();
-}
+﻿@model string
 
 <div class="modal-content">
     <div class="modal-header">
@@ -10,95 +8,106 @@
     <div class="modal-body">
         <table class="table table-bordered">
             <tr>
-                <td class="is_Ingreee">
-                    <p>Is ingree?</p>
-                    <select class="form-control" id="is_Ingreee-addField">
-                        <option value="true">True</option>
-                        <option value="false" selected>False</option>
-                    </select>
+                <td>
+                    <label for="friendlyName-addField">Friendly name</label>
+                    <input type="text" class="form-control" id="friendlyName-addField" placeholder="eg. sister tablet" />
                 </td>
-                <td class="description">
-                    <p>Description</p>
-                    <input type="text" class="form-control" id="description-addField" placeholder="Sister tablet" />
+
+                <td>
+                    <label for="src_mac-addField">Source mac</label>
+                    <input type="text" class="form-control" id="src_mac-addField" placeholder="eg. 6C:5F:1C:9E:F5:53,6C:5F:1C:9E:F5:53"/>
                 </td>
-                <td class="active">
-                    <p>Is active?</p>
+
+                <td>
+                    <label for="src_ip-addField">Source ip</label>
+                    <input type="text" class="form-control" id="src_ip-addField" placeholder="eg. 192.168.1.101,192.168.1.102"/>
+                </td>
+
+                <td>
+                    <label for="src_port-addField">Source port</label>
+                    <input type="text" class="form-control" id="src_port-addField" placeholder="eg. 22,1300-1400"/>
+                </td>
+
+                <td>
+                    <label for="dest_ip-addField">Destination IP</label>
+                    <input type="text" class="form-control" id="dest_ip-addField" placeholder="eg. 192.168.1.101,192.168.1.102"/>
+                </td>
+
+                <td>
+                    <label for="dest_port-addField">Destination port</label>
+                    <input type="text" class="form-control" id="dest_port-addField" placeholder="eg. 22,1300-1400"/>
+                </td>
+
+                <td>
+                    <label for="active-addField">Enabled</label>
                     <select class="form-control" id="active-addField">
-                        <option value="True" selected>True</option>
-                        <option value="False">False</option>
+                        <option value="1" selected>True</option>
+                        <option value="0">False</option>
                     </select>
                 </td>
-            </tr>
-            <tr>
-                <td class="local_addr">
-                    <p>MACs and/or IPs</p>
-                    <input type="text" class="form-control" id="local_addr-addField" placeholder="6C:5F:1C:9E:F5:53,192.168.2.107" />
-                </td>
-                <td class="active_hours">
-                    <p>Hours (empty = permanent)</p>
-                    <input type="text" class="form-control" id="active_hours-addField" placeholder="23:30-23:59,00:00-08:00" />
-                </td>
-                <td class="add">
+                <td>
                     <button id="addRule-btn" class="btn btn-success">Add</button>
                 </td>
             </tr>
         </table>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default col-md-12" data-dismiss="modal">Close</button>
     </div>
 </div>
 <script>
     $(document).ready(function () {
         $("#addRule-btn").click(function () {
-            var objectToSend = {
-                Type: "restriction_rule",
-                Is_Ingreee: $('#is_Ingreee-addField').val(),
-                Description: $('#description-addField').val(),
-                Local_addr: $('#local_addr-addField').val(),
-                Active_hours: $('#active_hours-addField').val(),
+            const objectToSend = {
+                FriendlyName: $('#friendlyName-addField').val(),
+                Src_mac: $('#src_mac-addField').val(),
+                Src_ip: $('#src_ip-addField').val(),
+                Src_port: $('#src_port-addField').val(),
+                Dest_ip: $('#dest_ip-addField').val(),
+                Dest_port: $('#dest_port-addField').val(),
                 Enabled: $('#active-addField').val()
-            }
+            };
 
-            if (objectToSend.Description.length === 0) {
-                alert("You have to type description");
+            if (objectToSend.FriendlyName.length === 0) {
+                alert("You have to type rule name");
                 return;
             }
 
-            if (objectToSend.Local_addr.length === 0) {
-                alert("You have to type addresses");
+            if (objectToSend.Src_mac.length === 0 &&
+                objectToSend.Src_ip.length === 0 &&
+                objectToSend.Src_port.length === 0 &&
+                objectToSend.Dest_ip.length === 0 &&
+                objectToSend.Dest_port.length === 0) {
+                alert("You have to at least one condition");
                 return;
             }
 
-            if (!validateMaCorIpAddressesSeparatedComa(objectToSend.Local_addr)) {
-                alert("You have typed adresses in not proper format");
-                return;
-            }
-
-            if (!validateHourSpansSeparatedComaOrEmpty(objectToSend.Active_hours)) {
-                alert("You have typed hours in not proper format");
-                return;
-            }
-
+            //validation function
+            
             $.ajax({
                 type: "POST",
                 url: "/Admin/SaveRule",
                 data:
                 {
-                    rule: objectToSend,
-                    name: '@routerName'
+                    restrictionRule: objectToSend,
+                    routerName: '@Model'
                 },
                 cache: false,
                 success: function (result) {
+                    if (rulesList.items.length === 0) {
+                        location.reload();
+                    }
+
                     if (result.status) {
                         rulesList.add({
-                            id: result.id,
-                            type: "restriction_rule",
-                            is_Ingreee: $('#is_Ingreee-addField').val(),
-                            description: $('#description-addField').val(),
-                            local_addr: $('#local_addr-addField').val().split(","),
-                            active_hours: $('#active_hours-addField').val().split(","),
-                            enabled: $('#active-addField').val()
+                            ruleName: result.ruleName,
+                            friendlyName: objectToSend.FriendlyNAme,
+                            src_mac: objectToSend.Src_mac,
+                            src_ip: objectToSend.Src_ip,
+                            src_port: objectToSend.Src_port,
+                            dest_ip: objectToSend.Dest_ip,
+                            dest_port: objectToSend.Dest_port,
+                            enabled: objectToSend.Enabled
                         });
                     }
                     else {
@@ -112,8 +121,8 @@
             });
         });
 
-        function validateMaCorIpAddressesSeparatedComa(inputText) {
-            var format = /^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$/;
+        function validateSrcMac(inputText) {
+            const format = /^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$/;
             if (inputText.match(format) != null) {
                 return true;
             }
@@ -122,8 +131,18 @@
             }
         }
 
-        function validateHourSpansSeparatedComaOrEmpty(inputText) {
-            var format = /^((([0-1]?[0-9]|2[0-4]):([0-5][0-9])(-)([0-1]?[0-9]|2[0-4]):([0-5][0-9])(,))*([0-1]?[0-9]|2[0-4]):([0-5][0-9])(-)([0-1]?[0-9]|2[0-4]):([0-5][0-9]))*$/;
+        function validateSrcIpDestIp(inputText) {
+            const format = /^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$/;
+            if (inputText.match(format) != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        function validateSrcPortDestPort(inputText) {
+            const format = /^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$/;
             if (inputText.match(format) != null) {
                 return true;
             }

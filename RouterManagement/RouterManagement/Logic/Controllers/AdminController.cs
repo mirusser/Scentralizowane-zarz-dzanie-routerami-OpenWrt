@@ -4,8 +4,6 @@ using System.Linq;
 using System.Web.Mvc;
 using RouterManagement.Logic.Connections;
 using RouterManagement.Models.ViewModels;
-using System.Text.RegularExpressions;
-using NativeWifi;
 using RouterManagement.Models;
 
 namespace RouterManagement.Logic.Controllers
@@ -20,9 +18,9 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult SendUciShow(string name = null)
         {
-            name = name ?? Routers.GetFirstRouterName();
+            name = name ?? RoutersConnections.GetFirstRouterName();
             if (name == null) return View("~/Views/Admin/NoRoutersError.cshtml");
-            var sshConnection = Routers.GetConnectionByName(name);
+            var sshConnection = RoutersConnections.GetConnectionByName(name);
             if (sshConnection == null) return null;
 
             var currentConfiguratrion = sshConnection.Send_UciShow();
@@ -34,7 +32,7 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult AllRouters()
         {
-            var allRouters = Routers.GetRoutersAsRouterAccesDataViewModel();
+            var allRouters = RoutersConnections.GetRoutersAsRouterAccesDataViewModel();
 
             return View(allRouters);
         }
@@ -42,14 +40,14 @@ namespace RouterManagement.Logic.Controllers
         [HttpPost]
         public ActionResult ReconnectAllRouter()
         {
-            Routers.ReconnectAllRouters();
+            RoutersConnections.ReconnectAllRouters();
 
             return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult AddRouterPartial()
         {
-            AddRouterDataPartialViewModel allRoutersNames = new AddRouterDataPartialViewModel {AllRoutersNames = Routers.GetAllRoutersNames()};
+            AddRouterDataPartialViewModel allRoutersNames = new AddRouterDataPartialViewModel {AllRoutersNames = RoutersConnections.GetAllRoutersNames()};
             return PartialView("~/Views/Admin/PartialViews/_AddRouter.cshtml", allRoutersNames);
         }
 
@@ -67,16 +65,16 @@ namespace RouterManagement.Logic.Controllers
                 Password = router.Password
             };
 
-            Routers.CreateNewConnection(routerAccesData);
+            RoutersConnections.CreateNewConnection(routerAccesData);
 
-            var isConnected = Routers.CheckIfRouterIsConnected(router.Name);
+            var isConnected = RoutersConnections.CheckIfRouterIsConnected(router.Name);
 
             return Json(new { status = "true", isConnected = isConnected.ToString() }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult ModifyRouterPartial(string router)
         {
-            var routerToModify = Routers.GetRouterAccesDataByName(router);
+            var routerToModify = RoutersConnections.GetRouterAccesDataByName(router);
             var routerToModifyModel = new ModifyRouterDataPartialViewModel
             {
                 Name = routerToModify.Name,
@@ -84,7 +82,7 @@ namespace RouterManagement.Logic.Controllers
                 Port = routerToModify.Port,
                 Login = routerToModify.Login,
                 Password = routerToModify.Password,
-                AllRoutersNames = Routers.GetAllRoutersNames().Except(new List<string>{router})
+                AllRoutersNames = RoutersConnections.GetAllRoutersNames().Except(new List<string>{router})
             };
             return PartialView("~/Views/Admin/PartialViews/_ModifyRouter.cshtml", routerToModifyModel);
         }
@@ -102,10 +100,10 @@ namespace RouterManagement.Logic.Controllers
                 Login = router.Login,
                 Password = router.Password
             };
-            Routers.DeleteConnectionByName(router.OldName);
-            Routers.CreateNewConnection(routerAccesData);
+            RoutersConnections.DeleteConnectionByName(router.OldName);
+            RoutersConnections.CreateNewConnection(routerAccesData);
 
-            var isConnected = Routers.CheckIfRouterIsConnected(router.Name);
+            var isConnected = RoutersConnections.CheckIfRouterIsConnected(router.Name);
 
             return Json(new { status = "true", isConnected = isConnected.ToString() }, JsonRequestBehavior.AllowGet);
         }
@@ -116,7 +114,7 @@ namespace RouterManagement.Logic.Controllers
             if(string.IsNullOrEmpty(name)) Json(false, JsonRequestBehavior.AllowGet);
             try
             {
-                Routers.DeleteConnectionByName(name);
+                RoutersConnections.DeleteConnectionByName(name);
             }
             catch
             {
@@ -134,9 +132,9 @@ namespace RouterManagement.Logic.Controllers
         {
             //var wlan = new WlanClient();  /play with this later
 
-            name = name ?? Routers.GetFirstRouterName();
+            name = name ?? RoutersConnections.GetFirstRouterName();
             if (name == null) return View("~/Views/Admin/NoRoutersError.cshtml");
-            var sshConnection = Routers.GetConnectionByName(name);
+            var sshConnection = RoutersConnections.GetConnectionByName(name);
             if (sshConnection == null) return null;
             var currentConfiguratrion = sshConnection.Send_UciShowWireless();
 
@@ -149,7 +147,7 @@ namespace RouterManagement.Logic.Controllers
                 Key = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".key")).Value,
                 Mode = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".mode")).Value,
                 Network = currentConfiguratrion.FirstOrDefault(c => c.Key.Contains(".network")).Value,
-                RouterName = string.IsNullOrEmpty(name) ? Routers.GetFirstRouterName() : name
+                RouterName = string.IsNullOrEmpty(name) ? RoutersConnections.GetFirstRouterName() : name
             };
 
             return View(configurationTrimmed);
@@ -168,7 +166,7 @@ namespace RouterManagement.Logic.Controllers
 
             try
             {
-                var sshConnection = Routers.GetConnectionByName(config.RouterName);
+                var sshConnection = RoutersConnections.GetConnectionByName(config.RouterName);
                 if (sshConnection == null) throw new Exception();
 
                 sshConnection.Send_UciSetWireless(config);
@@ -184,69 +182,31 @@ namespace RouterManagement.Logic.Controllers
 
         #region firewall
 
-        public ActionResult Firewall(string name = null)  //TODO search for value "restriction_rule" and get rule name, then only select keys for this rule name
+        public ActionResult Firewall(string name = null)
         {
-            name = name ?? Routers.GetFirstRouterName();
+            name = name ?? RoutersConnections.GetFirstRouterName();
             if (name == null) return View("~/Views/Admin/NoRoutersError.cshtml");
-            var sshConnection = Routers.GetConnectionByName(name);
+            var sshConnection = RoutersConnections.GetConnectionByName(name);
             if (sshConnection == null) return null;
-            var currentConfiguratrion = sshConnection?.Send_UciShowFirewall();
 
-            currentConfiguratrion = currentConfiguratrion.Where(c => c.Key.Contains("rule_")).ToDictionary(it => it.Key, it => it.Value);
-            var firewallList = new List<FirewallViewModel>();
-
-            var n = 1;
-            while (currentConfiguratrion.Any(c => c.Key.Contains($"firewall.rule_{n}")))
+            var model = new FirewallViewModel
             {
-                var itemToAdd = new FirewallViewModel {Id = n};
+                FirewallRestrictionRules = sshConnection.Get_AllFirewallRestrictionRules(),
+                RouterName = name
+            };
 
-                if(currentConfiguratrion.ContainsKey($"firewall.rule_{n}"))
-                {
-                    itemToAdd.Type = currentConfiguratrion[$"firewall.rule_{n}"];
-                }
-
-                if (currentConfiguratrion.ContainsKey($"firewall.rule_{n}.is_ingress"))
-                {
-                    itemToAdd.Is_Ingreee = (currentConfiguratrion[$"firewall.rule_{n}.is_ingress"] == "1");
-                }
-
-                if (currentConfiguratrion.ContainsKey($"firewall.rule_{n}.description"))
-                {
-                    itemToAdd.Description = currentConfiguratrion[$"firewall.rule_{n}.description"];
-                }
-
-                if (currentConfiguratrion.ContainsKey($"firewall.rule_{n}.local_addr"))
-                {
-                    itemToAdd.Local_addr = currentConfiguratrion[$"firewall.rule_{n}.local_addr"].Trim().Split(',');
-                }
-
-                if (currentConfiguratrion.ContainsKey($"firewall.rule_{n}.active_hours"))
-                {
-                    itemToAdd.Active_hours = currentConfiguratrion[$"firewall.rule_{n}.active_hours"].Trim().Split(',');
-                }
-
-                if (currentConfiguratrion.ContainsKey($"firewall.rule_{n}.enabled"))
-                {
-                    itemToAdd.Enabled = (currentConfiguratrion[$"firewall.rule_{n}.enabled"] == "1");
-                }
-
-                firewallList.Add(itemToAdd);
-
-                n++;
-            }
-
-            return View(firewallList);
+            return View(model);
         }
 
         [HttpPost]
-        public ActionResult RemoveRule(int ruleId, string name)
+        public ActionResult RemoveRule(string ruleName, string routerName)
         {
             try
             {
-                var sshConnection = Routers.GetConnectionByName(name);
+                var sshConnection = RoutersConnections.GetConnectionByName(routerName);
                 if (sshConnection == null) throw new Exception();
 
-                sshConnection.Send_DeleteFirewallRule(ruleId);
+                sshConnection.Send_DeleteFirewallRestrictionRule(ruleName);
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
             catch
@@ -256,33 +216,22 @@ namespace RouterManagement.Logic.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddRulePartial()
+        public ActionResult AddRulePartial(string routerName)
         {
-            return PartialView("~/Views/Admin/PartialViews/_AddRule.cshtml");
+            return PartialView("~/Views/Admin/PartialViews/_AddRule.cshtml", routerName);
         }
 
         [HttpPost]
-        public ActionResult SaveRule(AddFirewallRuleViewModel rule, string name)
+        public ActionResult SaveRule(AddFirewallRuleViewModel restrictionRule, string routerName)
         {
-            if(rule.Active_hours == null)
-            {
-                rule.Active_hours = string.Empty;
-            }
-            //test regex here: http://regexr.com/
-            if (string.IsNullOrEmpty(rule.Description) ||
-                string.IsNullOrEmpty(rule.Type) ||
-                !Regex.IsMatch(rule.Local_addr, @"^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$") ||
-                !Regex.IsMatch(rule.Active_hours, @"^((([0-1]?[0-9]|2[0-4]):([0-5][0-9])(-)([0-1]?[0-9]|2[0-4]):([0-5][0-9])(,))*([0-1]?[0-9]|2[0-4]):([0-5][0-9])(-)([0-1]?[0-9]|2[0-4]):([0-5][0-9]))*$"))
-            {
-                return Json(false, JsonRequestBehavior.AllowGet);
-            }
+            if (!ModelState.IsValid) return Json(false, JsonRequestBehavior.AllowGet);
 
             try
             {
-                if (name == null) name = Routers.GetFirstRouterName();
-                var sshConnection = Routers.GetConnectionByName(name);
-                var newId = sshConnection.Send_SaveFirewallRule(rule);
-                return Json(new { id = newId, status = true }, JsonRequestBehavior.AllowGet);
+                if (routerName == null) routerName = RoutersConnections.GetFirstRouterName();
+                var sshConnection = RoutersConnections.GetConnectionByName(routerName);
+                var ruleName = sshConnection.Send_SaveFirewallRestrictionRule(restrictionRule);
+                return Json(new { ruleName = ruleName, status = true }, JsonRequestBehavior.AllowGet);
             }
             catch
             {

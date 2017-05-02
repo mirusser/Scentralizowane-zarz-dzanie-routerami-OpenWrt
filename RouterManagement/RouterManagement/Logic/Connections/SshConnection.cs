@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Renci.SshNet;
 using RouterManagement.Logic.Connections.Interfaces;
@@ -147,42 +148,93 @@ namespace RouterManagement.Logic.Connections
             }
 
             writeStream($"uci commit");
-            writeStream($"wifi");
-
-            Thread.Sleep(15000);
-
-            writeStream("clear");
+            SendCommand($"wifi");
+            Thread.Sleep(5000);
         }
 
-        public Dictionary<string, string> Send_UciShowFirewall()
+        public List<FirewallRuleViewModel> Get_AllFirewallRestrictionRules()
         {
-            var answer = SendCommand("uci show firewall");
-            return parseAnswerToDictionary(answer);
+            var rulesNames = getRestrictionRulesNames();
+
+            var rulesList = new List<FirewallRuleViewModel>();
+
+            foreach (var ruleName in rulesNames)
+            {
+                var routerConfig = SendCommand($"uci show firewall.{ruleName}");
+                var currentConfiguratrion = parseAnswerToDictionary(routerConfig);
+
+                var itemToAdd = new FirewallRuleViewModel();
+                itemToAdd.RuleName = ruleName;
+
+                if (currentConfiguratrion.ContainsKey($"firewall.{ruleName}.name"))
+                {
+                    itemToAdd.FriendlyName = currentConfiguratrion[$"firewall.{ruleName}.name"].Trim('\'');
+                }
+
+                if (currentConfiguratrion.ContainsKey($"firewall.{ruleName}.src_mac"))
+                {
+                    itemToAdd.Src_mac = currentConfiguratrion[$"firewall.{ruleName}.src_mac"].Trim().Trim('\'').Split(',');
+                }
+
+                if (currentConfiguratrion.ContainsKey($"firewall.{ruleName}.src_ip"))
+                {
+                    itemToAdd.Src_ip = currentConfiguratrion[$"firewall.{ruleName}.src_ip"].Trim().Trim('\'').Split(',');
+                }
+
+                if (currentConfiguratrion.ContainsKey($"firewall.{ruleName}.src_port"))
+                {
+                    itemToAdd.Src_port = currentConfiguratrion[$"firewall.{ruleName}.src_port"].Trim().Trim('\'').Split(',');
+                }
+
+                if (currentConfiguratrion.ContainsKey($"firewall.{ruleName}.dest_ip"))
+                {
+                    itemToAdd.Dest_ip = currentConfiguratrion[$"firewall.{ruleName}.dest_ip"].Trim().Trim('\'').Split(',');
+                }
+
+                if (currentConfiguratrion.ContainsKey($"firewall.{ruleName}.dest_port"))
+                {
+                    itemToAdd.Dest_port = currentConfiguratrion[$"firewall.{ruleName}.dest_port"].Trim().Trim('\'').Split(',');
+                }
+
+                if (currentConfiguratrion.ContainsKey($"firewall.{ruleName}.enabled"))
+                {
+                    itemToAdd.Enabled = currentConfiguratrion[$"firewall.{ruleName}.enabled"].Trim('\'');
+                }
+
+                rulesList.Add(itemToAdd);
+            }
+
+            return rulesList;
         }
 
-        public void Send_DeleteFirewallRule(int ruleId)
+        public void Send_DeleteFirewallRestrictionRule(string ruleName)
         {
-            writeStream($"uci delete firewall.rule_{ruleId}");
+            writeStream($"uci delete firewall.{ruleName}");
             writeStream($"uci commit");
         }
 
-        public int Send_SaveFirewallRule(AddFirewallRuleViewModel rule)
+        public string Send_SaveFirewallRestrictionRule(AddFirewallRuleViewModel rule)
         {
-            var id = getNewId();
+            var ruleName = getNewRestrictionRuleName();
 
-            writeStream($"uci set firewall.rule_{id}={rule.Type}");
-            writeStream($"uci set firewall.rule_{id}.is_ingress={Convert.ToInt32(rule.Is_Ingreee)}");
-            writeStream($"uci set firewall.rule_{id}.description={rule.Description}");
-            writeStream($"uci set firewall.rule_{id}.local_addr={rule.Local_addr}");
-            if (!string.IsNullOrEmpty(rule.Active_hours))
-            {
-                writeStream($"uci set firewall.rule_{id}.active_hours={rule.Active_hours}");
-            }
-            writeStream($"uci set firewall.rule_{id}.enabled={Convert.ToInt32(rule.Enabled)}");
+            writeStream($"uci set firewall.{ruleName}=rule");
+            writeStream($"uci set firewall.{ruleName}.src='*'");
+            writeStream($"uci set firewall.{ruleName}.dest='*'");
+            writeStream($"uci set firewall.{ruleName}.name='{rule.FriendlyName}'");
+            if (!string.IsNullOrEmpty(rule.Src_mac)) writeStream($"uci set firewall.{ruleName}.src_mac='{rule.Src_mac}'");
+            if (!string.IsNullOrEmpty(rule.Src_ip)) writeStream($"uci set firewall.{ruleName}.src_ip='{rule.Src_ip}'");
+            if (!string.IsNullOrEmpty(rule.Src_port)) writeStream($"uci set firewall.{ruleName}.src_port='{rule.Src_port}'");
+            if (!string.IsNullOrEmpty(rule.Dest_ip)) writeStream($"uci set firewall.{ruleName}.dest_ip='{rule.Dest_ip}'");
+            if (!string.IsNullOrEmpty(rule.Dest_port)) writeStream($"uci set firewall.{ruleName}.dest_port='{rule.Dest_port}'");
+            writeStream($"uci set firewall.{ruleName}.target='DROP'");
+            writeStream($"uci set firewall.{ruleName}.enabled='{rule.Enabled}'");
 
             writeStream($"uci commit firewall");
+            SendCommand($"/etc/init.d/firewall restart");
 
-            return id;
+            Thread.Sleep(1500);
+
+            return ruleName;
         }
 
         #region fake methods
@@ -283,23 +335,26 @@ namespace RouterManagement.Logic.Connections
             }
         }
 
-        private int getNewId()
+        private string getNewRestrictionRuleName()
         {
-            var answer = Send_UciShowFirewall();
-            var rules = answer.Select(it => it.Key).Where(k => k.Contains("firewall.rule_"));
-            var ids = new List<int>();
-            foreach (var r in rules)
+            var howMuchToDelete = "RouterManagementRule_".Length;
+            var rulesNumbers = getRestrictionRulesNames().Select(r => Convert.ToInt32(r.Remove(0, howMuchToDelete))).OrderBy(r => r).ToList();
+
+            if (!rulesNumbers.Any())
             {
-                try
-                {
-                    ids.Add((int)char.GetNumericValue(r[14]));
-                }
-                catch
-                {
-                    // ignored
-                }
+                return "RouterManagementRule_1";
             }
-            return ids.Any() ? ids.Max() + 1 : 1;
+
+            var numbersBetween = Enumerable.Range(1, rulesNumbers.Last()).Except(rulesNumbers).ToList();
+            return numbersBetween.Any() ? $"RouterManagementRule_{numbersBetween.First()}" : $"RouterManagementRule_{rulesNumbers.Last() + 1}";
+        }
+
+        private IEnumerable<string> getRestrictionRulesNames()
+        {
+            var answer = SendCommand("grep RouterManagementRule /etc/config/firewall");
+
+            return from Match match in Regex.Matches(answer, "\'([^\']*)\'")
+                select match.ToString().Trim('\'');
         }
 
         #endregion

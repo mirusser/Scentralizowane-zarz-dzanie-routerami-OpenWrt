@@ -4,8 +4,8 @@ namespace RouterManagement.Models.ViewModels
 {
     public class RouterOnListViewModel
     {
-        public bool IsActive;
-        public string Name;
-        public SshConnection SshConnection;
+        public bool IsActive { get; set; }
+        public string Name { get; set; }
+        public SshConnection SshConnection { get; set; }
     }
 }

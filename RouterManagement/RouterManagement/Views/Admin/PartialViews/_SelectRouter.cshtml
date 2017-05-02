@@ -26,7 +26,7 @@
                     @: $('#routersSelect').val("@Request.QueryString["name"]");
                 }
                 else{
-                    @: $('#routersSelect').val("@RouterManagement.Logic.Connections.Routers.GetFirstRouterName()");
+                    @: $('#routersSelect').val("@RouterManagement.Logic.Connections.RoutersConnections.GetFirstRouterName()");
                 }
             }
         });

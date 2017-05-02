@@ -101,6 +101,10 @@
                 },
                 cache: false,
                 success: function (result) {
+                    if (routersList.items.length === 0) {
+                        location.reload();
+                    }
+
                     if (result.status == "true") {
                         let online = '';
 

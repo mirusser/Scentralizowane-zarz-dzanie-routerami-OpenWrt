@@ -8,7 +8,7 @@ namespace RouterManagement.Logic.Controllers
         [HttpPost]
         public ActionResult GetRouterNames()
         {
-            var names = Routers.GetOnlineRoutersNames();
+            var names = RoutersConnections.GetOnlineRoutersNames();
             return Json(names, JsonRequestBehavior.AllowGet);
         }
     }

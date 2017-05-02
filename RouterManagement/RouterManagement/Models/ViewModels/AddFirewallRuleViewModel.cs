@@ -1,12 +1,17 @@
-﻿namespace RouterManagement.Models.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+using RouterManagement.Logic.DataAnnotations;
+
+namespace RouterManagement.Models.ViewModels
 {
     public class AddFirewallRuleViewModel
     {
-        public string Type { get; set; }
-        public bool Is_Ingreee { get; set; }
-        public string Description { get; set; }
-        public string Local_addr { get; set; }
-        public string Active_hours { get; set; }
-        public bool Enabled { get; set; }
+        public string RuleName { get; set; }
+        public string FriendlyName { get; set; }
+        public string Src_mac { get; set; }
+        public string Src_ip { get; set; }
+        public string Src_port { get; set; }
+        public string Dest_ip { get; set; }
+        public string Dest_port { get; set; }
+        public string Enabled { get; set; }
     }
 }
