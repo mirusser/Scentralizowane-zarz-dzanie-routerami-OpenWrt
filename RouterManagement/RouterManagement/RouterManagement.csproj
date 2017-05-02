@@ -340,7 +340,7 @@
     <Content Include="Views\Home\Partials\_LoginOnHomePage.cshtml" />
     <Content Include="Views\Home\Partials\_Home.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
-    <Content Include="Views\Admin\SendUciShow.cshtml" />
+    <Content Include="Views\Admin\FullConfiguration.cshtml" />
     <Content Include="Views\Admin\Wireless.cshtml" />
     <Content Include="Views\Admin\WirelessPartialViews\_EditWireless.cshtml" />
     <Content Include="Views\Admin\Firewall.cshtml" />

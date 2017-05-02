@@ -58,7 +58,7 @@ namespace RouterManagement.Tests.Connections
         }
 
         [TestMethod]
-        public void Send_UciShow_Succes()
+        public void Get_FullConfiguration_Succes()
         {
             var test1 = new SshConnection("192.168.1.1", "root", "konopie");
             var answer = test1.Get_FullConfiguration();
@@ -68,7 +68,7 @@ namespace RouterManagement.Tests.Connections
         }
 
         [TestMethod]
-        public void Send_UciShowWireless_Succes()
+        public void Get_WirelessWireless_Succes()
         {
             var test1 = new SshConnection("192.168.1.1", "root", "konopie");
             var answer = test1.Get_Wireless();

@@ -19,7 +19,9 @@ namespace RouterManagement.Logic.Controllers
             return View();
         }
 
-        public ActionResult SendUciShow(string name = null)
+        #region full configuration
+
+        public ActionResult FullConfiguration(string name = null)
         {
             name = name ?? RoutersConnections.GetFirstRouterName();
             if (name == null) return View("~/Views/Admin/NoRoutersError.cshtml");
@@ -30,6 +32,8 @@ namespace RouterManagement.Logic.Controllers
 
             return View(currentConfiguratrion);
         }
+
+        #endregion
 
         #region router acces data configuration
 
@@ -252,7 +256,7 @@ namespace RouterManagement.Logic.Controllers
 
             var model = new ModifyFirewallRuleViewModel
             {
-                RouterName =  rule.RouterName,
+                RouterName = rule.RouterName,
                 RuleName = rule.RuleName,
                 FriendlyName = ruleToModify.FriendlyName,
                 Src_mac = (ruleToModify.Src_mac != null)

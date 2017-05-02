@@ -250,7 +250,7 @@ namespace RouterManagement.Logic.Connections
 
         #region fake methods
 
-        public Dictionary<string, string> SendFake_UciShow()
+        public Dictionary<string, string> GetFake_FullConfiguration()
         {
             using (var client = new WebClient())
             {
@@ -265,7 +265,7 @@ namespace RouterManagement.Logic.Connections
             }
         }
 
-        public Dictionary<string, string> SendFake_UciShowWireless()
+        public Dictionary<string, string> GetFake_Wireless()
         {
             using (WebClient client = new WebClient())
             {
@@ -280,7 +280,7 @@ namespace RouterManagement.Logic.Connections
             }
         }
 
-        public Dictionary<string, string> SendFake_UciShowFirewall()
+        public Dictionary<string, string> GetFake_AllFirewallRestrictionRules()
         {
             using (WebClient client = new WebClient())
             {
