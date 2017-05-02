@@ -1,7 +1,13 @@
-﻿
-@{
-    ViewBag.Title = "NoRoutersAdded";
+﻿@{
+    ViewBag.Title = "Offline";
 }
 
-<h2>There is no online routers. Check in routers page accesibility of them.</h2>
-
+<div class="text-center">
+    <div class="alert alert-danger">
+        <h2>There is no online routers. Check in routers page accesibility of them.</h2>
+    </div>
+    @using (Html.BeginForm("AllRouters", "Admin", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+    {
+        <input type="submit" value="Click here to add router." class="btn btn btn-primary" />
+    }
+</div>
