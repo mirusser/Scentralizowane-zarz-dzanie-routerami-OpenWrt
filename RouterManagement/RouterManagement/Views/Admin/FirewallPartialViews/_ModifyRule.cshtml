@@ -69,7 +69,7 @@
         $('#modalSpin').modal('hide');
 
         $("#modifyRule-btn").click(function () {
-            //$('#modalSpin').modal('show');
+            $('#modalSpin').modal('show');
 
             const objectToSend = {
                 RouterName: '@Model.RouterName',
@@ -99,8 +99,33 @@
                 valid = false;
             }
 
+            if (!validateSrcMac(objectToSend.Src_mac)) {
+                $.notify("You have typed source Mac in not proper format");
+                valid = false;
+            }
+
+            if (!validateSrcIpDestIp(objectToSend.Src_ip)) {
+                $.notify("You have typed source IP in not proper format");
+                valid = false;
+            }
+
+            if (!validateSrcPortDestPort(objectToSend.Src_port)) {
+                $.notify("You have typed source port in not proper format");
+                valid = false;
+            }
+
+            if (!validateSrcIpDestIp(objectToSend.Dest_ip)) {
+                $.notify("You have typed destination IP in not proper format");
+                valid = false;
+            }
+
+            if (!validateSrcPortDestPort(objectToSend.Dest_port)) {
+                $.notify("You have typed destination port in not proper format");
+                valid = false;
+            }
+
             if (valid === false) {
-                //$('#modalSpin').modal('hide');
+                $('#modalSpin').modal('hide');
                 return;
             }
 
@@ -129,7 +154,7 @@
                         $.notify("Error when modyfying rule occured");
                     }
 
-                    //$('#modalSpin').modal('hide');
+                    $('#modalSpin').modal('hide');
 
                     $("#modifyRuleContainer").html("");
 
@@ -138,8 +163,8 @@
             });
         });
 
-        function validateIpOrDomain(inputText) {
-            const format = /^((((([a-zA-Z]+|[a-zA-Z0-9]*)\.)+)(([a-zA-Z]+[a-zA-Z0-9]*)+))|((\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5])))|(localhost))$/;
+        function validateSrcMac(inputText) {
+            const format = /(^$|^(((([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})[,])*)(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})))$)/;
             if (inputText.match(format) != null) {
                 return true;
             }
@@ -148,8 +173,8 @@
             }
         }
 
-        function validateNumberOrEmpty(inputText) {
-            const format = /^(\s*|\d+)$/;
+        function validateSrcIpDestIp(inputText) {
+            const format = /(^$|^((((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])[,])*)((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])))$)/;
             if (inputText.match(format) != null) {
                 return true;
             }
@@ -158,14 +183,14 @@
             }
         }
 
-        function contains(a, obj) {
-            var i = a.length;
-            while (i--) {
-                if (a[i] == obj) {
-                    return true;
-                }
+        function validateSrcPortDestPort(inputText) {
+            const format = /(^$|^((([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])[,])|((([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])([-])([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))[,]))*((([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))|(([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])([-])([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))$)/;
+            if (inputText.match(format) != null) {
+                return true;
             }
-            return false;
+            else {
+                return false;
+            }
         }
     });
 </script>

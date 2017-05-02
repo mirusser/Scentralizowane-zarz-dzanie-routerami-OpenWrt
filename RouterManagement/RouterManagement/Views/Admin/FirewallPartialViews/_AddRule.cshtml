@@ -14,12 +14,12 @@
                 </td>
 
                 <td>
-                    <label for="src_mac-addField">Source mac</label>
+                    <label for="src_mac-addField">Source MAC</label>
                     <input type="text" class="form-control" id="src_mac-addField" placeholder="eg. 6C:5F:1C:9E:F5:53,6C:5F:1C:9E:F5:53"/>
                 </td>
 
                 <td>
-                    <label for="src_ip-addField">Source ip</label>
+                    <label for="src_ip-addField">Source IP</label>
                     <input type="text" class="form-control" id="src_ip-addField" placeholder="eg. 192.168.1.101,192.168.1.102"/>
                 </td>
 
@@ -57,7 +57,11 @@
 </div>
 <script>
     $(document).ready(function () {
+        $('#modalSpin').modal('hide');
+
         $("#addRule-btn").click(function () {
+            $('#modalSpin').modal('show');
+
             const objectToSend = {
                 RouterName: '@Model',
                 FriendlyName: $('#friendlyName-addField').val(),
@@ -69,9 +73,11 @@
                 Enabled: $('#active-addField').val()
             };
 
+            var valid = true;
+
             if (objectToSend.FriendlyName.length === 0) {
-                alert("You have to type rule name");
-                return;
+                $.notify("You have to type rule name");
+                valid = false;
             }
 
             if (objectToSend.Src_mac.length === 0 &&
@@ -79,11 +85,39 @@
                 objectToSend.Src_port.length === 0 &&
                 objectToSend.Dest_ip.length === 0 &&
                 objectToSend.Dest_port.length === 0) {
-                alert("You have to type at least one condition");
-                return;
+                $.notify("You have to type at least one condition");
+                valid = false;
             }
 
-            //validation function
+            if (!validateSrcMac(objectToSend.Src_mac)) {
+                $.notify("You have typed source Mac in not proper format");
+                valid = false;
+            }
+
+            if (!validateSrcIpDestIp(objectToSend.Src_ip)) {
+                $.notify("You have typed source IP in not proper format");
+                valid = false;
+            }
+
+            if (!validateSrcPortDestPort(objectToSend.Src_port)) {
+                $.notify("You have typed source port in not proper format");
+                valid = false;
+            }
+
+            if (!validateSrcIpDestIp(objectToSend.Dest_ip)) {
+                $.notify("You have typed destination IP in not proper format");
+                valid = false;
+            }
+
+            if (!validateSrcPortDestPort(objectToSend.Dest_port)) {
+                $.notify("You have typed destination port in not proper format");
+                valid = false;
+            }
+
+            if (valid === false) {
+                $('#modalSpin').modal('hide');
+                return;
+            }
             
             $.ajax({
                 type: "POST",
@@ -108,8 +142,10 @@
                         });
                     }
                     else {
-                        alert("Error when adding new rule occured");
+                        $.notify("Error when adding new rule occured");
                     }
+
+                    $('#modalSpin').modal('hide');
 
                     $("#addRuleContainer").html("");
 
@@ -119,7 +155,7 @@
         });
 
         function validateSrcMac(inputText) {
-            const format = /^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$/;
+            const format = /(^$|^(((([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})[,])*)(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})))$)/;
             if (inputText.match(format) != null) {
                 return true;
             }
@@ -129,7 +165,7 @@
         }
 
         function validateSrcIpDestIp(inputText) {
-            const format = /^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$/;
+            const format = /(^$|^((((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])[,])*)((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])))$)/;
             if (inputText.match(format) != null) {
                 return true;
             }
@@ -139,7 +175,7 @@
         }
 
         function validateSrcPortDestPort(inputText) {
-            const format = /^((([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(,))*(([0-9A-F]{2}[:]){5}([0-9A-F]{2})|(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$/;
+            const format = /(^$|^((([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])[,])|((([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])([-])([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))[,]))*((([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))|(([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])([-])([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))$)/;
             if (inputText.match(format) != null) {
                 return true;
             }

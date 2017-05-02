@@ -364,7 +364,7 @@ namespace RouterManagement.Logic.Connections
         {
             var answer = Send_CustomCommand("grep RouterManagementRule /etc/config/firewall");
 
-            return from Match match in Regex.Matches(answer, "\'([^\']*)\'")
+            return from Match match in Regex.Matches(answer, "(RouterManagementRule_)([0-9]+)")
                 select match.ToString();
         }
 

@@ -75,7 +75,10 @@
     var rulesList = new List('rules', options);
 
     $(document).ready(function () {
+        $('#modalSpin').modal('hide');
+
         $(document).on('click', '#addRuleBtn', function () {
+            $('#modalSpin').modal('show');
             const url = $('#addRuleModal').data('url');
 
             $.ajax({
@@ -87,12 +90,13 @@
                 cache: false,
                 success: function (data) {
                     $('#addRuleContainer').html(data);
-                    $('#addRuleModal').appendTo("body").modal('show');
+                    $('#addRuleModal').appendTo("#bodyContent").modal('show');
                 }
             });
         });
 
         $(document).on('click', '.edit-item', function () {
+            $('#modalSpin').modal('show');
             const url = $('#modifyRuleModal').data('url');
             const ruleName = $(this).closest('tr').find('.ruleName').text();
 
@@ -106,12 +110,13 @@
                 cache: false,
                 success: function (data) {
                     $('#modifyRuleContainer').html(data);
-                    $('#modifyRuleModal').appendTo("body").modal('show');
+                    $('#modifyRuleModal').appendTo("#bodyContent").modal('show');
                 }
             });
         });
 
         $(document).on('click', '.remove-item', function () {
+            $('#modalSpin').modal('show');
             var ruleName = $(this).closest('tr').find('.ruleName').text();
             $.ajax({
                 type: "POST",
@@ -126,8 +131,10 @@
                         rulesList.remove("ruleName", ruleName);
                     }
                     else {
-                        alert("There was a problem when deleting rule.");
+                        $.notify("There was a problem when deleting rule.");
                     }
+
+                    $('#modalSpin').modal('hide');
                 }
             });
         });
