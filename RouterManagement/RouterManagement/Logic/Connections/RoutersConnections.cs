@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using RouterManagement.Logic.Repositories;
 using RouterManagement.Models;
@@ -74,6 +75,7 @@ namespace RouterManagement.Logic.Connections
         {
             RouterDataList.Clear();
             Initialize();
+            Thread.Sleep(1000);
         }
 
         public static List<RouterActivityViewModel> GetRoutersAsRouterAccesDataViewModel()

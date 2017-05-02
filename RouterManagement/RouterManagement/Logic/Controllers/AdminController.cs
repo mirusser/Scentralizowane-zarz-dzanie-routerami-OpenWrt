@@ -133,8 +133,6 @@ namespace RouterManagement.Logic.Controllers
 
         public ActionResult Wireless(string name = null)
         {
-            //var wlan = new WlanClient();  /play with this later
-
             name = name ?? RoutersConnections.GetFirstRouterName();
             if (name == null) return View("~/Views/Admin/NoRoutersError.cshtml");
             var sshConnection = RoutersConnections.GetConnectionByName(name);
@@ -173,6 +171,7 @@ namespace RouterManagement.Logic.Controllers
                 if (sshConnection == null) throw new Exception();
 
                 sshConnection.Send_SaveWireless(config);
+                RoutersConnections.ReconnectAllRouters();
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
             catch
