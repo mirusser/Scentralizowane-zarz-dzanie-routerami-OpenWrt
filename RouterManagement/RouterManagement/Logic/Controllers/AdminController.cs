@@ -35,7 +35,7 @@ namespace RouterManagement.Logic.Controllers
 
         #endregion
 
-        #region router acces data configuration
+        #region added routers
 
         public ActionResult AllRouters()
         {

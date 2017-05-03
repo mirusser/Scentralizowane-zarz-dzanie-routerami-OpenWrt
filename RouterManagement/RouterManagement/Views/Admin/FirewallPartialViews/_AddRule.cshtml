@@ -129,6 +129,14 @@
                         location.reload();
                     }
 
+                    let enabled = '';
+                    if (objectToSend.Enabled === "1") {
+                        enabled = '<span class="glyphicon glyphicon-ok" style="color:green;"></span>';
+                    }
+                    else {
+                        enabled = '<span class="glyphicon glyphicon-remove" style="color:red;"></span>';
+                    }
+
                     if (result.status) {
                         rulesList.add({
                             ruleName: result.ruleName,
@@ -138,7 +146,7 @@
                             src_port: objectToSend.Src_port,
                             dest_ip: objectToSend.Dest_ip,
                             dest_port: objectToSend.Dest_port,
-                            enabled: objectToSend.Enabled
+                            enabled: enabled
                         });
                     }
                     else {
