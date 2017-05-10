@@ -5,7 +5,7 @@ namespace RouterManagement.Models.Context
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("AmazonSQL", throwIfV1Schema: false)
+            : base("LocalDB", throwIfV1Schema: false)
         {
         }
 
