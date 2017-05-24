@@ -155,5 +155,15 @@ namespace RouterManagement.Logic.Connections
 
             return searchedRouter?.Name;
         }
+
+        public static int GetNumbersOfSavedClients()
+        {
+            return RouterDataList.Count;
+        }
+
+        public static int GetNumbersOfConnectedClients()
+        {
+            return RouterDataList.Count(it => it.IsActive);
+        }
     }
 }

@@ -7,6 +7,7 @@ using RouterManagement.Models.ViewModels;
 using RouterManagement.Models;
 using RouterManagement.Models.ViewModels.Firewall;
 using RouterManagement.Models.ViewModels.Router;
+using RouterManagement.Models.ViewModels.Status;
 using RouterManagement.Models.ViewModels.Wireless;
 
 namespace RouterManagement.Logic.Controllers
@@ -16,7 +17,17 @@ namespace RouterManagement.Logic.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            var model = new AdminPanelViewModel();
+            model.NumbersOfSavedClients = RoutersConnections.GetNumbersOfSavedClients();
+            model.NumbersOfConnectedClients = RoutersConnections.GetNumbersOfConnectedClients();
+            model.RoutersStatusViewModel = RoutersConnections.GetOnlineRoutersNames()
+                .Select(name => new RoutersStatusViewModel
+                {
+                    RouterName = name,
+                    CurrentMemoryUsage = RoutersConnections.GetConnectionByName(name).Get_CurrentRamUsage()
+                });
+
+            return View(model);
         }
 
         #region full configuration

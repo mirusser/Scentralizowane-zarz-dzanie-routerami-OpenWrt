@@ -12,6 +12,7 @@ using RouterManagement.Logic.Connections.Interfaces;
 using RouterManagement.Models;
 using RouterManagement.Models.ViewModels;
 using RouterManagement.Models.ViewModels.Firewall;
+using RouterManagement.Models.ViewModels.Status;
 using RouterManagement.Models.ViewModels.Wireless;
 
 namespace RouterManagement.Logic.Connections
@@ -246,6 +247,22 @@ namespace RouterManagement.Logic.Connections
             Send_CustomCommand($"/etc/init.d/firewall restart");
 
             return ruleName;
+        }
+
+        public CurrentMemoryUsageViewModel Get_CurrentRamUsage()
+        {
+            // ReSharper disable once UseObjectOrCollectionInitializer
+            var currentRamUsage = new CurrentMemoryUsageViewModel();
+
+            currentRamUsage.RamTotal = Convert.ToInt32(Regex.Match(Send_CustomCommand($"grep MemTotal /proc/meminfo"), "([0-9]+)").Value);
+            currentRamUsage.RamFree = Convert.ToInt32(Regex.Match(Send_CustomCommand($"grep MemFree /proc/meminfo"), "([0-9]+)").Value);
+            currentRamUsage.RamUsed = currentRamUsage.RamTotal - currentRamUsage.RamFree;
+
+            currentRamUsage.SwapTotal = Convert.ToInt32(Regex.Match(Send_CustomCommand($"grep SwapTotal /proc/meminfo"), "([0-9]+)").Value);
+            currentRamUsage.SwapFree = Convert.ToInt32(Regex.Match(Send_CustomCommand($"grep SwapFree /proc/meminfo"), "([0-9]+)").Value);
+            currentRamUsage.SwapUsed = currentRamUsage.SwapTotal - currentRamUsage.SwapFree;
+
+            return currentRamUsage;
         }
 
         #region fake methods

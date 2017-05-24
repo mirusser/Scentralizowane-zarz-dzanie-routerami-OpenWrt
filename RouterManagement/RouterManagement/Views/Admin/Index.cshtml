@@ -1,4 +1,6 @@
-﻿@{
+﻿@model RouterManagement.Models.ViewModels.Status.AdminPanelViewModel
+
+@{
     ViewBag.Title = "Admin";
 }
 
@@ -32,10 +34,45 @@
     </div>
     <div class="col-md-8">
         <h2 class="text-center">Current system parameters</h2>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus accumsan semper ex quis fringilla. Mauris eleifend, eros ut rutrum aliquam, sapien dolor tempor libero, ut interdum nulla odio ut odio. Integer sagittis ipsum sit amet justo consectetur vestibulum. Vivamus porttitor leo quam, quis eleifend velit auctor sit amet. Sed est ex, porttitor ac tincidunt eu, viverra at velit. Mauris ultrices suscipit condimentum. Nulla pellentesque tristique dolor vel fringilla. Cras tincidunt sagittis sapien eget ultricies. Mauris ac velit bibendum, finibus quam non, sollicitudin erat. Vivamus faucibus egestas metus, ac gravida neque tincidunt nec. Phasellus tristique semper auctor. Praesent semper, magna a cursus aliquet, enim lacus lobortis diam, sit amet vestibulum velit lorem id diam. Duis egestas tellus eu nunc pulvinar, non gravida leo luctus. Aenean ipsum magna, dictum sit amet suscipit et, lobortis at ante.
-        </p>
+
+        <table class="table table-striped table-bordered">
+            <tbody>
+                <tr>
+                    <td>Defined clients in database</td>
+                    <td>@Model.NumbersOfSavedClients</td>
+                </tr>
+                <tr>
+                    <td>Connected clients</td>
+                    <td>@Model.NumbersOfConnectedClients</td>
+                </tr>
+            </tbody>
+        </table>
+
+        
+
+        @foreach (var router in Model.RoutersStatusViewModel)
+        { 
+        <table class="table table-striped table-bordered">
+            <thead class="thead-inverse">
+                <tr>
+                    <th colspan="2">Online routers basics data</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Name</td>
+                <td>@router.RouterName</td>
+            </tr>
+            <tr>
+                <td>RAM</td>
+                <td>Total: @router.CurrentMemoryUsage.RamTotal kB, Used: @router.CurrentMemoryUsage.RamUsed kB, Free: @router.CurrentMemoryUsage.RamFree kB</td>
+            </tr>
+            <tr>
+                <td>SWAP</td>
+                <td>Total: @router.CurrentMemoryUsage.SwapTotal kB, Used: @router.CurrentMemoryUsage.SwapUsed kB, Free: @router.CurrentMemoryUsage.SwapFree kB</td>
+            </tr>
+            </tbody>
+        </table>
+        }
     </div>
 </div>
-
-
